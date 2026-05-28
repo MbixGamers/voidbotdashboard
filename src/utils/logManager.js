@@ -6,7 +6,6 @@ const CATEGORY_NAMES = {
   security: 'Security',
   moderation: 'Moderation',
   ticket: 'Ticket',
-  economy: 'Economy',
   command: 'Commands',
   system: 'System',
   custom: 'Custom',
@@ -16,6 +15,19 @@ const CATEGORY_NAMES = {
 
 function buildEmbed(options = {}) {
   const embed = options.embed instanceof EmbedBuilder ? options.embed : new EmbedBuilder();
+
+  if (options.author || options.authorName) {
+    const author = options.author || {};
+    const name = author.name || options.authorName;
+    const iconURL = author.iconURL || author.iconUrl || options.authorIcon;
+    const url = author.url || options.authorUrl;
+    if (name) {
+      embed.setAuthor({ name, iconURL, url });
+    }
+  }
+
+  if (options.thumbnail) embed.setThumbnail(options.thumbnail);
+  if (options.image) embed.setImage(options.image);
 
   if (options.title) embed.setTitle(options.title);
   if (options.description) embed.setDescription(options.description);

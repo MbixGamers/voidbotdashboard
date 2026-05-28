@@ -8,7 +8,6 @@ const DEFAULT_CATEGORIES = {
   security: true,
   moderation: true,
   ticket: true,
-  economy: true,
   command: true,
   system: true,
   custom: true,

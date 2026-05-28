@@ -1,6 +1,23 @@
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const logManager = require('./logManager');
 
+const DANGEROUS_PERMISSION_LABELS = {
+  Administrator: 'Administrator',
+  ManageGuild: 'Manage Server',
+  ManageRoles: 'Manage Roles',
+  ManageChannels: 'Manage Channels',
+  KickMembers: 'Kick Members',
+  BanMembers: 'Ban Members',
+  ManageMessages: 'Manage Messages',
+  ManageWebhooks: 'Manage Webhooks',
+  ManageEmojisAndStickers: 'Manage Emojis & Stickers',
+  ViewAuditLog: 'View Audit Log',
+  ModerateMembers: 'Moderate Members',
+  ManageNicknames: 'Manage Nicknames',
+  MentionEveryone: 'Mention @everyone',
+  ViewGuildInsights: 'View Insights'
+};
+
 function getMemberLabel(member) {
   if (!member) return 'Unknown member';
   return member.user ? `${member.user.tag} (${member.id})` : `${member.id}`;
@@ -40,6 +57,23 @@ function formatDuration(ms) {
   if (seconds % 60 && parts.length < 3) parts.push(`${seconds % 60} second${seconds % 60 === 1 ? '' : 's'}`);
 
   return parts.slice(0, 3).join(', ') || '0 seconds';
+}
+
+function formatDangerousPermissions(permissions) {
+  if (!permissions) return [];
+  return permissions.toArray().filter(name => DANGEROUS_PERMISSION_LABELS[name]).map(name => DANGEROUS_PERMISSION_LABELS[name]);
+}
+
+function hasDangerousPermissions(permissions) {
+  return formatDangerousPermissions(permissions).length > 0;
+}
+
+function getDangerousPermissionChanges(oldPermissions, newPermissions) {
+  const oldList = formatDangerousPermissions(oldPermissions);
+  const newList = formatDangerousPermissions(newPermissions);
+  const added = newList.filter(item => !oldList.includes(item));
+  const removed = oldList.filter(item => !newList.includes(item));
+  return { added, removed };
 }
 
 function formatChannelDescription(channel) {
@@ -91,6 +125,7 @@ async function handleMessageDelete(message) {
   const attachmentCount = message.attachments?.size || 0;
   const description = `**Channel:** ${getChannelLabel(channel)}\n**Message ID:** ${message.id}\n**Author:** ${getUserLabel(message.author)}\n**Content:** ${truncateText(content)}`;
   const fields = [];
+  const author = message.author ? { name: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) } : null;
 
   if (attachmentCount > 0) {
     fields.push({ name: 'Attachments', value: `${attachmentCount} attachment(s)`, inline: true });
@@ -100,6 +135,7 @@ async function handleMessageDelete(message) {
     title: attachmentCount > 0 ? '🖼️ Message Deleted (Attachment)' : '🗑️ Message Deleted',
     description,
     fields,
+    author,
     color: 0xff0000,
     footer: 'Message deleted',
     timestamp: true
@@ -122,6 +158,7 @@ async function handleMessageUpdate(oldMessage, newMessage) {
     { name: 'Before', value: truncateText(oldContent) },
     { name: 'After', value: truncateText(newContent) }
   ];
+  const author = newMessage.author ? { name: newMessage.author.tag, iconURL: newMessage.author.displayAvatarURL({ dynamic: true }) } : null;
 
   if (oldAttachments !== newAttachments) {
     fields.push({ name: 'Attachments', value: `${oldAttachments} → ${newAttachments}`, inline: true });
@@ -131,6 +168,7 @@ async function handleMessageUpdate(oldMessage, newMessage) {
     title: '✏️ Message Edited',
     description: `**Channel:** ${getChannelLabel(channel)}\n**Message ID:** ${newMessage.id}\n**Author:** ${getUserLabel(newMessage.author)}`,
     fields,
+    author,
     color: 0xffa500,
     footer: 'Message edited',
     timestamp: true
@@ -185,10 +223,12 @@ async function handleInviteDelete(invite) {
 async function handleGuildMemberAdd(member) {
   const createdAt = member.user?.createdTimestamp || null;
   const accountAge = createdAt ? formatDuration(Date.now() - createdAt) : 'Unknown';
+  const author = member.user ? { name: member.user.tag, iconURL: member.user.displayAvatarURL({ dynamic: true }) } : null;
 
   await logManager.sendLog(member.guild, 'server_logs', {
     title: '✅ Member Joined',
     description: `**Member:** ${member.user?.tag || 'Unknown'}\n**Username:** ${member.user?.username || 'Unknown'}\n**User ID:** ${member.id}`,
+    author,
     fields: [
       { name: 'Account Created', value: formatTimestamp(createdAt, 'F'), inline: true },
       { name: 'Account Age', value: accountAge, inline: true }
@@ -203,10 +243,12 @@ async function handleGuildMemberRemove(member) {
   const roles = member.roles?.cache.filter(role => role.id !== member.guild.id);
   const roleList = roles && roles.size ? roles.map(role => role.toString()).join(' ') : 'No roles';
   const joinedAt = member.joinedTimestamp || null;
+  const author = member.user ? { name: member.user.tag, iconURL: member.user.displayAvatarURL({ dynamic: true }) } : null;
 
   await logManager.sendLog(member.guild, 'server_logs', {
     title: '🚪 Member Left',
     description: `**Member:** ${getMemberLabel(member)}\n**User ID:** ${member.id}\n**Joined:** ${formatTimestamp(joinedAt, 'R')}`,
+    author,
     fields: [
       { name: 'Member joined', value: joinedAt ? formatDuration(Date.now() - joinedAt) : 'Unknown', inline: true },
       { name: 'Roles', value: roleList, inline: false }
@@ -217,10 +259,38 @@ async function handleGuildMemberRemove(member) {
   });
 }
 
+async function handleGuildUpdate(oldGuild, newGuild) {
+  const changes = [];
+  if (oldGuild.name !== newGuild.name) changes.push({ name: 'Name', value: `${oldGuild.name} → ${newGuild.name}` });
+  if (oldGuild.verificationLevel !== newGuild.verificationLevel) changes.push({ name: 'Verification Level', value: `${oldGuild.verificationLevel} → ${newGuild.verificationLevel}` });
+  if (oldGuild.afkChannelId !== newGuild.afkChannelId) changes.push({ name: 'AFK Channel', value: `${oldGuild.afkChannel?.name || 'None'} → ${newGuild.afkChannel?.name || 'None'}` });
+  if (oldGuild.afkTimeout !== newGuild.afkTimeout) changes.push({ name: 'AFK Timeout', value: `${oldGuild.afkTimeout} → ${newGuild.afkTimeout}` });
+  if (oldGuild.systemChannelId !== newGuild.systemChannelId) changes.push({ name: 'System Channel', value: `${oldGuild.systemChannel?.name || 'None'} → ${newGuild.systemChannel?.name || 'None'}` });
+  if (oldGuild.rulesChannelId !== newGuild.rulesChannelId) changes.push({ name: 'Rules Channel', value: `${oldGuild.rulesChannel?.name || 'None'} → ${newGuild.rulesChannel?.name || 'None'}` });
+  if (oldGuild.publicUpdatesChannelId !== newGuild.publicUpdatesChannelId) changes.push({ name: 'Updates Channel', value: `${oldGuild.publicUpdatesChannel?.name || 'None'} → ${newGuild.publicUpdatesChannel?.name || 'None'}` });
+  if (oldGuild.vanityURLCode !== newGuild.vanityURLCode) changes.push({ name: 'Vanity URL', value: `${oldGuild.vanityURLCode || 'None'} → ${newGuild.vanityURLCode || 'None'}` });
+  if (oldGuild.banner !== newGuild.banner) changes.push({ name: 'Banner', value: 'Server banner updated' });
+  if (oldGuild.splash !== newGuild.splash) changes.push({ name: 'Splash', value: 'Server splash updated' });
+
+  if (!changes.length) return;
+
+  await logManager.sendLog(newGuild, 'server_logs', {
+    title: '🏛️ Server Updated',
+    description: `**Server:** ${newGuild.name}\n**ID:** ${newGuild.id}`,
+    fields: changes,
+    thumbnail: newGuild.iconURL({ dynamic: true }),
+    color: 0x00b0f4,
+    footer: 'Server update',
+    timestamp: true
+  });
+}
+
 async function handleGuildBanAdd(ban) {
+  const author = ban.user ? { name: ban.user.tag, iconURL: ban.user.displayAvatarURL({ dynamic: true }) } : null;
   await logManager.sendLog(ban.guild, 'server_logs', {
     title: '⛔ Member Banned',
     description: `**User:** ${getUserLabel(ban.user)}`,
+    author,
     color: 0xff0000,
     footer: 'Member ban',
     timestamp: true
@@ -228,9 +298,11 @@ async function handleGuildBanAdd(ban) {
 }
 
 async function handleGuildBanRemove(guild, user) {
+  const author = user ? { name: user.tag, iconURL: user.displayAvatarURL({ dynamic: true }) } : null;
   await logManager.sendLog(guild, 'server_logs', {
     title: '🔓 Member Unbanned',
     description: `**User:** ${getUserLabel(user)}`,
+    author,
     color: 0x00ff00,
     footer: 'Member unban',
     timestamp: true
@@ -256,11 +328,23 @@ async function handleGuildMemberUpdate(oldMember, newMember) {
   const addedRoles = [...newRoles].filter(roleId => !oldRoles.has(roleId));
   const removedRoles = [...oldRoles].filter(roleId => !newRoles.has(roleId));
 
+  let color = 0xffa500;
   if (addedRoles.length > 0) {
     const roleNames = addedRoles.map(roleId => newMember.guild.roles.cache.get(roleId)?.toString() || roleId);
     changes.push({ name: 'Role Added', value: roleNames.join(' ') });
     if (!nicknameChanged && removedRoles.length === 0 && !newMember.communicationDisabledUntilTimestamp && !oldMember.communicationDisabledUntilTimestamp) {
       title = '➕ Role Given';
+    }
+
+    const dangerousRoles = addedRoles
+      .map(roleId => newMember.guild.roles.cache.get(roleId))
+      .filter(role => role && hasDangerousPermissions(role.permissions));
+
+    if (dangerousRoles.length > 0) {
+      const dangerousDetails = dangerousRoles.map(role => `**${role.name}**: ${formatDangerousPermissions(role.permissions).join(', ')}`);
+      changes.push({ name: '⚠️ Dangerous Role Assigned', value: dangerousDetails.join('\n'), inline: false });
+      title = '⚠️ Dangerous Role Assigned';
+      color = 0xff0000;
     }
   }
   if (removedRoles.length > 0) {
@@ -283,31 +367,46 @@ async function handleGuildMemberUpdate(oldMember, newMember) {
     }
   }
 
-  if (!changes.length) return;
+  if (!changes.length) return;  
   if (nicknameChanged && addedRoles.length === 0 && removedRoles.length === 0 && oldTimeout === newTimeout) {
     title = '✏️ Nickname Changed';
   }
+
+  const author = newMember.user ? { name: newMember.user.tag, iconURL: newMember.user.displayAvatarURL({ dynamic: true }) } : null;
 
   await logManager.sendLog(newMember.guild, 'mod_logs', {
     title,
     description: `**Member:** ${getMemberLabel(newMember)}\n**User ID:** ${newMember.id}`,
     fields: changes,
-    color: 0xffa500,
+    author,
+    color,
     footer: 'Member update',
     timestamp: true
   });
 }
 
 async function handleRoleCreate(role) {
+  const dangerousPermissions = formatDangerousPermissions(role.permissions);
+  const fields = [
+    { name: 'Color', value: role.hexColor || 'Default', inline: true },
+    { name: 'Hoist', value: role.hoist ? 'Yes' : 'No', inline: true },
+    { name: 'Mentionable', value: role.mentionable ? 'Yes' : 'No', inline: true }
+  ];
+
+  let title = '➕ Role Created';
+  let color = 0x00ff00;
+  if (dangerousPermissions.length > 0) {
+    title = '⚠️ Role Created with Dangerous Permissions';
+    color = 0xff0000;
+    fields.push({ name: 'Dangerous Permissions', value: dangerousPermissions.join(', '), inline: false });
+  }
+
   await logManager.sendLog(role.guild, 'server_logs', {
-    title: '➕ Role Created',
+    title,
     description: `**Role:** ${role.toString()}\n**ID:** ${role.id}`,
-    fields: [
-      { name: 'Color', value: role.hexColor || 'Default', inline: true },
-      { name: 'Hoist', value: role.hoist ? 'Yes' : 'No', inline: true },
-      { name: 'Mentionable', value: role.mentionable ? 'Yes' : 'No', inline: true }
-    ],
-    color: 0x00ff00,
+    fields,
+    thumbnail: role.guild.iconURL({ dynamic: true }),
+    color,
     footer: 'Role create',
     timestamp: true
   });
@@ -346,13 +445,29 @@ async function handleRoleUpdate(oldRole, newRole) {
     changes.push({ name: 'Position', value: `${oldRole.position} → ${newRole.position}` });
   }
 
+  const permissionChange = getDangerousPermissionChanges(oldRole.permissions, newRole.permissions);
+  const hasDangerousChange = permissionChange.added.length > 0 || permissionChange.removed.length > 0;
+
+  if (hasDangerousChange) {
+    if (permissionChange.added.length > 0) {
+      changes.push({ name: '⚠️ Dangerous Permissions Added', value: permissionChange.added.join(', '), inline: false });
+    }
+    if (permissionChange.removed.length > 0) {
+      changes.push({ name: 'ℹ️ Dangerous Permissions Removed', value: permissionChange.removed.join(', '), inline: false });
+    }
+  }
+
   if (!changes.length) return;
 
+  const titleText = hasDangerousChange ? '⚠️ Role Updated — Permission Change' : '✏️ Role Updated';
+  const color = permissionChange.added.length > 0 ? 0xff0000 : 0x00b0f4;
+
   await logManager.sendLog(newRole.guild, 'server_logs', {
-    title: '✏️ Role Updated',
+    title: titleText,
     description: `**Role:** ${newRole.toString()}\n**ID:** ${newRole.id}`,
     fields: changes,
-    color: 0x00b0f4,
+    thumbnail: newRole.guild.iconURL({ dynamic: true }),
+    color,
     footer: 'Role update',
     timestamp: true
   });
@@ -553,6 +668,7 @@ module.exports = {
   handleInviteDelete,
   handleGuildMemberAdd,
   handleGuildMemberRemove,
+  handleGuildUpdate,
   handleGuildBanAdd,
   handleGuildBanRemove,
   handleGuildMemberUpdate,

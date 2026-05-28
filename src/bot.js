@@ -831,6 +831,10 @@ client.on(Events.GuildMemberUpdate, (oldMember, newMember) => {
   serverLogHandler.handleGuildMemberUpdate(oldMember, newMember).catch(console.error);
 });
 
+client.on(Events.GuildUpdate, (oldGuild, newGuild) => {
+  serverLogHandler.handleGuildUpdate(oldGuild, newGuild).catch(console.error);
+});
+
 client.on(Events.RoleCreate, (role) => {
   securityHandler.handleRoleCreate(role).catch(console.error);
   serverLogHandler.handleRoleCreate(role).catch(console.error);
