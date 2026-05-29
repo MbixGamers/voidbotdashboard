@@ -1,0 +1,66 @@
+create table if not exists public.profiles (
+  discord_id text primary key,
+  username text not null,
+  avatar_url text,
+  role text not null default 'staff' check (role in ('staff', 'admin')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.staff_stats (
+  discord_id text primary key references public.profiles(discord_id) on delete cascade,
+  username text not null,
+  avatar_url text,
+  week_start date not null default date_trunc('week', now())::date,
+  tickets_claimed_total integer not null default 0,
+  tickets_claimed_week integer not null default 0,
+  messages_total integer not null default 0,
+  messages_week integer not null default 0,
+  last_claimed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.mod_checks (
+  id uuid primary key default gen_random_uuid(),
+  weekly_ticket_goal integer not null default 0,
+  message_goal integer not null default 0,
+  is_active boolean not null default true,
+  created_by text,
+  active_from timestamptz not null default now(),
+  active_to timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.ticket_transcripts (
+  id uuid primary key default gen_random_uuid(),
+  ticket_channel_id text not null unique,
+  guild_id text,
+  ticket_channel_name text,
+  ticket_type text,
+  opener_id text,
+  opener_username text,
+  claimed_by text,
+  claimed_by_username text,
+  closed_by text,
+  closer_username text,
+  close_reason text,
+  transcript_text text,
+  discord_message_url text,
+  closed_at timestamptz not null default now(),
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists staff_stats_week_idx on public.staff_stats(week_start);
+create index if not exists transcripts_closed_at_idx on public.ticket_transcripts(closed_at desc);
+create index if not exists transcripts_people_idx on public.ticket_transcripts(opener_id, claimed_by, closed_by);
+
+alter table public.profiles enable row level security;
+alter table public.staff_stats enable row level security;
+alter table public.mod_checks enable row level security;
+alter table public.ticket_transcripts enable row level security;
+
+-- The Vercel API uses the service-role key for reads/writes after validating Supabase auth tokens.
+-- Keep browser clients blocked from direct table reads unless you intentionally add stricter RLS policies later.
