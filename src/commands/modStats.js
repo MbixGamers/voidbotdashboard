@@ -1,4 +1,6 @@
 // src/commands/modStats.js
+const dashboardSync = require('../utils/dashboardSync');
+
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 const fs = require('fs').promises;
 const path = require('path');
@@ -924,6 +926,7 @@ function initModStats(client) {
     if (relevant) {
       messageCounts[message.author.id] = (messageCounts[message.author.id] || 0) + 1;
       scheduleWrite();
+      dashboardSync.syncStaffMessage(message.author).catch(() => {});
     }
 
     // Check if this message is in a ticket category

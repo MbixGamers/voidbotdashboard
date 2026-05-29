@@ -29,6 +29,7 @@ module.exports = {
   trackedRoles: process.env.TRACKED_ROLES ? process.env.TRACKED_ROLES.split(',').map(id => id.trim()) : [],
 
   // Dashboard & MongoDB
-  dashboardBaseUrl: process.env.DASHBOARD_BASE_URL || 'http://localhost:3000',
+  dashboardBaseUrl: process.env.DASHBOARD_BASE_URL || null,
+  dashboardApiKey: process.env.DASHBOARD_BOT_API_KEY || null,
   mongoUri: process.env.MONGODB_URI || null,
 };

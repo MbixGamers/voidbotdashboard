@@ -4,6 +4,7 @@ const ticketConfig = require('./ticketConfig');
 const guildConfig = require('./guildConfig');
 const config = require('../config');
 const modStats = require('../commands/modStats');
+const dashboardSync = require('./dashboardSync');
 
 async function safeReply(interaction, content, options = {}) {
   try {
@@ -345,6 +346,7 @@ async function handleClaim(interaction) {
 
     // Increment claimed tickets count for this staff member
     modStats.incrementClaimedTicket(interaction.user.id);
+    dashboardSync.syncTicketClaim(interaction.user).catch(() => {});
 
     const message = interaction.message;
     if (message) {
@@ -460,7 +462,30 @@ async function closeTicket(channel, closerId, reason, client) {
           embed.addFields({ name: '🙋 Claimed by', value: `<@${data.claimedBy}>`, inline: true });
         }
 
-        await transcriptChannel.send({ embeds: [embed], files: [transcriptFile] }).catch(() => {});
+        const transcriptMessage = await transcriptChannel.send({ embeds: [embed], files: [transcriptFile] }).catch(() => null);
+        const opener = await client.users.fetch(data.openerId).catch(() => null);
+        const claimedBy = data.claimedBy ? await client.users.fetch(data.claimedBy).catch(() => null) : null;
+        const closer = await client.users.fetch(closerId).catch(() => null);
+
+        dashboardSync.syncTicketTranscript({
+          ticket_channel_id: channel.id,
+          guild_id: guild.id,
+          ticket_channel_name: channel.name,
+          ticket_type: data.type,
+          opener_id: data.openerId,
+          opener_username: opener?.tag || opener?.username || data.openerId,
+          claimed_by: data.claimedBy || null,
+          claimed_by_username: claimedBy?.tag || claimedBy?.username || null,
+          closed_by: closerId,
+          closer_username: closer?.tag || closer?.username || closerId,
+          close_reason: reason,
+          transcript_text: transcriptFile.attachment.toString('utf8'),
+          discord_message_url: transcriptMessage?.url || null,
+          closed_at: new Date().toISOString(),
+          metadata: {
+            transcript_file_name: transcriptFile.name
+          }
+        }).catch(() => {});
       }
     }
 
