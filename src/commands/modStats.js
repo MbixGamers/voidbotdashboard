@@ -248,8 +248,11 @@ async function preScanTicketChannels(client) {
               ticketChannelReplies.get(channel.id).add(msg.author.id);
               totalRepliesFound++;
               
-              // Also count this message for messageCounts
-              messageCounts[msg.author.id] = (messageCounts[msg.author.id] || 0) + 1;
+              // Also count this historic ticket message once for local command accuracy.
+              if (!processedMessages.has(msg.id)) {
+                processedMessages.add(msg.id);
+                messageCounts[msg.author.id] = (messageCounts[msg.author.id] || 0) + 1;
+              }
             }
           }
           
@@ -269,6 +272,7 @@ async function preScanTicketChannels(client) {
   // Save the pre-scanned data
   await scheduleRepliesWrite();
   await scheduleWrite();
+  await saveProcessedMessages();
   
   console.log(`✅ Pre-scan complete: ${totalChannelsScanned} channels, ${totalRepliesFound} staff messages found`);
   
@@ -919,18 +923,20 @@ function initModStats(client) {
     // Ignore bot messages
     if (message.author.bot) return;
 
-    const member = message.member;
+    const member = message.member || await message.guild?.members.fetch(message.author.id).catch(() => null);
     const relevant = isStaff(member);
-
-    // Track message counts for staff
-    if (relevant) {
-      messageCounts[message.author.id] = (messageCounts[message.author.id] || 0) + 1;
-      scheduleWrite();
-      dashboardSync.syncStaffMessage(message.author).catch(() => {});
-    }
 
     // Check if this message is in a ticket category
     const isTicketChannel = message.channel.parentId && TICKET_CATEGORIES.includes(message.channel.parentId);
+
+    // Track staff messages only inside ticket channels so dashboard goals match ticket support activity.
+    if (isTicketChannel && relevant && !processedMessages.has(message.id)) {
+      processedMessages.add(message.id);
+      messageCounts[message.author.id] = (messageCounts[message.author.id] || 0) + 1;
+      scheduleWrite();
+      saveProcessedMessages().catch(() => {});
+      dashboardSync.syncStaffMessage(message.author, message).catch(() => {});
+    }
     
     if (isTicketChannel && relevant) {
       const channelId = message.channel.id;

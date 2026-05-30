@@ -1,4 +1,4 @@
-import { handleApiError, selectRows, sendJson, upsertProfile, upsertRows } from '../_supabase.js';
+import { handleApiError, insertRows, selectRows, sendJson, upsertProfile, upsertRows } from '../_supabase.js';
 
 function requireBotKey(req) {
   const expected = process.env.DASHBOARD_BOT_API_KEY;
@@ -18,8 +18,39 @@ function weekStart(date = new Date()) {
   return copy.toISOString().slice(0, 10);
 }
 
+async function recordMessageEvent(payload) {
+  if (!payload.message_id) return true;
+
+  try {
+    await insertRows('dashboard_message_events', [{
+      message_id: payload.message_id,
+      discord_id: payload.discord_id,
+      channel_id: payload.channel_id || null,
+      guild_id: payload.guild_id || null,
+      created_at: payload.message_created_at || new Date().toISOString()
+    }]);
+    return true;
+  } catch (error) {
+    if (error.statusCode === 409 || /duplicate key|violates unique/i.test(error.message || '')) {
+      return false;
+    }
+    if (error.statusCode === 404 || /dashboard_message_events|relation/i.test(error.message || '')) {
+      return true;
+    }
+    throw error;
+  }
+}
+
 async function syncStaffStat(payload) {
   if (!payload.discord_id) throw new Error('discord_id is required for staff_stat events');
+
+  const ticketIncrement = Number(payload.tickets_claimed_increment || 0);
+  let messageIncrement = Number(payload.messages_increment || 0);
+
+  if (messageIncrement > 0) {
+    const isNewMessage = await recordMessageEvent(payload);
+    if (!isNewMessage) messageIncrement = 0;
+  }
 
   await upsertProfile({
     discord_id: payload.discord_id,
@@ -32,8 +63,6 @@ async function syncStaffStat(payload) {
   const existing = existingRows[0];
   const currentWeek = weekStart();
   const sameWeek = existing?.week_start === currentWeek;
-  const ticketIncrement = Number(payload.tickets_claimed_increment || 0);
-  const messageIncrement = Number(payload.messages_increment || 0);
 
   const rows = await upsertRows('staff_stats', [{
     discord_id: payload.discord_id,

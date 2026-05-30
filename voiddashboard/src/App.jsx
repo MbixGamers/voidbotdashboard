@@ -26,6 +26,10 @@ const fallbackDashboard = {
     { discord_id: '1002', username: 'Nova', tickets_claimed_week: 24, messages_week: 109 },
     { discord_id: '1003', username: 'Echo', tickets_claimed_week: 18, messages_week: 96 }
   ],
+  settings: {
+    auth_guild_id: '1351362266246680626',
+    auth_role_id: '1444524137526853723'
+  },
   transcripts: [
     {
       id: 'sample-1',
@@ -110,7 +114,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
-  const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100 });
+  const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100, auth_guild_id: '1351362266246680626', auth_role_id: '1444524137526853723' });
 
   const loadDashboard = useCallback(async (activeSession) => {
     if (!activeSession?.access_token) {
@@ -131,7 +135,9 @@ function App() {
       setDashboard(data);
       setModForm({
         weekly_ticket_goal: data.modCheck?.weekly_ticket_goal || 0,
-        message_goal: data.modCheck?.message_goal || 0
+        message_goal: data.modCheck?.message_goal || 0,
+        auth_guild_id: data.settings?.auth_guild_id || '1351362266246680626',
+        auth_role_id: data.settings?.auth_role_id || '1444524137526853723'
       });
     } catch (error) {
       setNotice(error.message);
@@ -204,13 +210,15 @@ function App() {
         },
         body: JSON.stringify({
           weekly_ticket_goal: Number(modForm.weekly_ticket_goal),
-          message_goal: Number(modForm.message_goal)
+          message_goal: Number(modForm.message_goal),
+          auth_guild_id: modForm.auth_guild_id,
+          auth_role_id: modForm.auth_role_id
         })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save mod-check settings');
-      setDashboard((current) => ({ ...current, modCheck: data.modCheck }));
-      setNotice('Mod-check requirements updated. Staff progress bars now use the new targets.');
+      setDashboard((current) => ({ ...current, modCheck: data.modCheck, settings: data.settings }));
+      setNotice('Dashboard requirements updated. Staff progress bars and authorization checks now use the new settings.');
     } catch (error) {
       setNotice(error.message);
     } finally {
@@ -218,7 +226,9 @@ function App() {
     }
   }
 
+  const isAuthError = /invalid staff authorization|not a staff member|required authority|not a Void staff/i.test(notice);
   const showLogin = isSupabaseConfigured && !session;
+  const showDashboard = !showLogin && !isAuthError;
 
   return (
     <div className="app-shell">
@@ -246,16 +256,16 @@ function App() {
 
       <header className="hero-card">
         <div className="hero-copy">
-          <p className="eyebrow">Separate Vercel dashboard</p>
-          <h1>Void Bot stats, mod checks, and ticket transcripts in one place.</h1>
+          <p className="eyebrow">Void staff operations</p>
+          <h1>A clean command center for ticket support performance.</h1>
           <p>
-            The Discord bot stays on Katabump. This Vercel app receives bot events through secured API routes,
-            stores them in Supabase, and shows each Discord user their own server dashboard after login.
+            Track claims, ticket replies, weekly mod-check goals, and closed-ticket transcripts from one polished dashboard.
+            Discord authorization is verified against the Void Server and Ticket Support role before staff data is shown.
           </p>
           <div className="hero-tags">
-            <span>Discord OAuth</span>
-            <span>Supabase</span>
-            <span>Vercel APIs</span>
+            <span>Role-gated access</span>
+            <span>Live staff metrics</span>
+            <span>Transcript archive</span>
           </div>
         </div>
         <aside className="profile-panel">
@@ -276,10 +286,18 @@ function App() {
         </section>
       ) : null}
 
-      {notice ? <p className="notice">{notice}</p> : null}
+      {notice ? <p className={isAuthError ? 'notice notice-error' : 'notice'}>{notice}</p> : null}
+      {isAuthError ? (
+        <section className="invalid-card">
+          <p className="eyebrow">Invalid authorization</p>
+          <h2>You are not a staff member or do not have the required authority.</h2>
+          <p>Access requires membership in the configured Void Server and the configured Ticket Support role. If this is a mistake, ask an admin to update your Discord role or adjust the dashboard authorization IDs.</p>
+          <button className="button button-secondary" onClick={signOut}>Sign out</button>
+        </section>
+      ) : null}
       {loading ? <p className="notice">Loading live dashboard data…</p> : null}
 
-      <main className="dashboard-grid">
+      {showDashboard ? <main className="dashboard-grid">
         <section className="card progress-summary">
           <div className="section-heading">
             <p className="eyebrow">Your weekly progress</p>
@@ -319,38 +337,71 @@ function App() {
           <section className="card admin-panel">
             <div className="section-heading">
               <p className="eyebrow">Admin controls</p>
-              <h2>Set mod-check requirements</h2>
+              <h2>Requirements and staff overview</h2>
+              <p>Keep weekly goals and Discord access rules in one tidy panel.</p>
             </div>
-            <form onSubmit={saveModCheck} className="mod-form">
-              <label>
-                Tickets per week
-                <input
-                  type="number"
-                  min="0"
-                  value={modForm.weekly_ticket_goal}
-                  onChange={(event) => setModForm((current) => ({ ...current, weekly_ticket_goal: event.target.value }))}
-                />
-              </label>
-              <label>
-                Messages per week
-                <input
-                  type="number"
-                  min="0"
-                  value={modForm.message_goal}
-                  onChange={(event) => setModForm((current) => ({ ...current, message_goal: event.target.value }))}
-                />
-              </label>
-              <button className="button button-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save requirements'}</button>
-            </form>
-            <div className="staff-table">
-              <div className="table-row table-head"><span>Staff</span><span>Tickets</span><span>Messages</span></div>
-              {(dashboard.staff || []).map((staffer) => (
-                <div className="table-row" key={staffer.discord_id}>
-                  <span>{staffer.username || staffer.discord_id}</span>
-                  <span>{formatNumber(staffer.tickets_claimed_week)}</span>
-                  <span>{formatNumber(staffer.messages_week)}</span>
+            <form onSubmit={saveModCheck} className="mod-form admin-form">
+              <div className="form-section">
+                <span className="form-section-title">Weekly mod check</span>
+                <div className="form-grid two-col">
+                  <label>
+                    Tickets per week
+                    <input
+                      type="number"
+                      min="0"
+                      value={modForm.weekly_ticket_goal}
+                      onChange={(event) => setModForm((current) => ({ ...current, weekly_ticket_goal: event.target.value }))}
+                    />
+                  </label>
+                  <label>
+                    Ticket messages per week
+                    <input
+                      type="number"
+                      min="0"
+                      value={modForm.message_goal}
+                      onChange={(event) => setModForm((current) => ({ ...current, message_goal: event.target.value }))}
+                    />
+                  </label>
                 </div>
-              ))}
+              </div>
+              <div className="form-section">
+                <span className="form-section-title">Discord authorization</span>
+                <div className="form-grid">
+                  <label>
+                    Required server ID
+                    <input
+                      inputMode="numeric"
+                      value={modForm.auth_guild_id}
+                      onChange={(event) => setModForm((current) => ({ ...current, auth_guild_id: event.target.value.trim() }))}
+                    />
+                  </label>
+                  <label>
+                    Required role ID
+                    <input
+                      inputMode="numeric"
+                      value={modForm.auth_role_id}
+                      onChange={(event) => setModForm((current) => ({ ...current, auth_role_id: event.target.value.trim() }))}
+                    />
+                  </label>
+                </div>
+              </div>
+              <button className="button button-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save dashboard settings'}</button>
+            </form>
+            <div className="staff-table-card">
+              <div className="table-title">
+                <strong>Staff leaderboard</strong>
+                <span>This week</span>
+              </div>
+              <div className="staff-table">
+                <div className="table-row table-head"><span>Staff</span><span>Tickets</span><span>Messages</span></div>
+                {(dashboard.staff || []).map((staffer) => (
+                  <div className="table-row" key={staffer.discord_id}>
+                    <span>{staffer.username || staffer.discord_id}</span>
+                    <span>{formatNumber(staffer.tickets_claimed_week)}</span>
+                    <span>{formatNumber(staffer.messages_week)}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         ) : null}
@@ -367,7 +418,7 @@ function App() {
             ))}
           </div>
         </section>
-      </main>
+      </main> : null}
     </div>
   );
 }

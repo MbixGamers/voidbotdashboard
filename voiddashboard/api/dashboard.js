@@ -1,4 +1,5 @@
 import {
+  getDashboardSettings,
   getDiscordAvatar,
   getDiscordUsername,
   handleApiError,
@@ -6,7 +7,8 @@ import {
   requireUser,
   selectRows,
   sendJson,
-  upsertProfile
+  upsertProfile,
+  verifyDiscordStaffAccess
 } from './_supabase.js';
 
 export default async function handler(req, res) {
@@ -17,6 +19,9 @@ export default async function handler(req, res) {
 
   try {
     const { user, discordId } = await requireUser(req);
+    const settings = await getDashboardSettings();
+    await verifyDiscordStaffAccess(discordId, settings);
+
     const profile = await upsertProfile({
       discord_id: discordId,
       username: getDiscordUsername(user),
@@ -59,7 +64,11 @@ export default async function handler(req, res) {
         last_claimed_at: null
       },
       staff,
-      transcripts
+      transcripts,
+      settings: {
+        auth_guild_id: settings.auth_guild_id,
+        auth_role_id: settings.auth_role_id
+      }
     });
   } catch (error) {
     return handleApiError(res, error);
