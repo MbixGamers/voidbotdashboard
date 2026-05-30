@@ -198,7 +198,8 @@ a { color: inherit; }
 .admin-panel { grid-column: 2; grid-row: span 2; }
 .mod-form { display: grid; gap: 14px; margin-bottom: 22px; }
 .mod-form label { display: grid; gap: 8px; color: #d9d4ee; font-weight: 800; }
-.mod-form input {
+.mod-form input,
+.mod-form textarea {
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.07);
   border-radius: 16px;
@@ -206,7 +207,9 @@ a { color: inherit; }
   padding: 13px 14px;
   outline: none;
 }
-.mod-form input:focus { border-color: #8d72ff; box-shadow: 0 0 0 4px rgba(141,114,255,0.12); }
+.mod-form input:focus,
+.mod-form textarea:focus { border-color: #8d72ff; box-shadow: 0 0 0 4px rgba(141,114,255,0.12); }
+.mod-form textarea { min-height: 110px; resize: vertical; }
 .staff-table { display: grid; gap: 8px; }
 .table-row {
   display: grid;
@@ -403,9 +406,11 @@ body::before {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.mod-form input {
+.mod-form input,
+.mod-form textarea {
   width: 100%;
 }
+.full-span { grid-column: 1 / -1; }
 
 .staff-table-card {
   display: grid;

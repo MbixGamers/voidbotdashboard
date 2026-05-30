@@ -61,6 +61,23 @@ async function syncStaffMessage(user, message = null) {
   });
 }
 
+
+async function syncStaffSnapshot(user, stats = {}) {
+  return postDashboardEvent('staff_stat', {
+    ...userPayload(user),
+    discord_id: user?.id || stats.discord_id,
+    username: user?.tag || user?.username || stats.username || 'Discord User',
+    avatar_url: typeof user?.displayAvatarURL === 'function' ? user.displayAvatarURL({ size: 128 }) : stats.avatar_url || null,
+    tickets_claimed_increment: 0,
+    messages_increment: 0,
+    tickets_claimed_total: Number(stats.tickets_claimed_total || 0),
+    tickets_claimed_week: Number(stats.tickets_claimed_week || 0),
+    messages_total: Number(stats.messages_total || 0),
+    messages_week: Number(stats.messages_week || 0),
+    last_claimed_at: stats.last_claimed_at || null
+  });
+}
+
 async function syncTicketTranscript(payload) {
   return postDashboardEvent('ticket_transcript', payload);
 }
@@ -68,6 +85,7 @@ async function syncTicketTranscript(payload) {
 module.exports = {
   isDashboardSyncConfigured,
   syncStaffMessage,
+  syncStaffSnapshot,
   syncTicketClaim,
   syncTicketTranscript,
   userPayload

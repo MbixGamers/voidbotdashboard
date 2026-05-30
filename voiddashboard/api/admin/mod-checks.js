@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const currentSettings = await getDashboardSettings();
     await verifyDiscordStaffAccess(discordId, currentSettings);
 
-    if (!isAdminDiscordId(discordId)) {
+    if (!isAdminDiscordId(discordId, currentSettings)) {
       return sendJson(res, 403, { error: 'Only dashboard admins can update mod-check requirements' });
     }
 
@@ -29,11 +29,18 @@ export default async function handler(req, res) {
     const messageGoal = Math.max(0, Number(req.body?.message_goal || 0));
     const authGuildId = String(req.body?.auth_guild_id || currentSettings.auth_guild_id || '').trim();
     const authRoleId = String(req.body?.auth_role_id || currentSettings.auth_role_id || '').trim();
+    const adminDiscordIds = Array.isArray(req.body?.admin_discord_ids)
+      ? req.body.admin_discord_ids
+      : String(req.body?.admin_discord_ids || '')
+        .split(/[\n,]+/)
+        .map((id) => id.trim())
+        .filter(Boolean);
     const now = new Date().toISOString();
 
     const settings = await saveDashboardSettings({
       auth_guild_id: authGuildId,
       auth_role_id: authRoleId,
+      admin_discord_ids: adminDiscordIds,
       updated_by: discordId
     });
 

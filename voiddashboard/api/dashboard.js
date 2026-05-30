@@ -26,10 +26,10 @@ export default async function handler(req, res) {
       discord_id: discordId,
       username: getDiscordUsername(user),
       avatar_url: getDiscordAvatar(user),
-      role: isAdminDiscordId(discordId) ? 'admin' : 'staff'
+      role: isAdminDiscordId(discordId, settings) ? 'admin' : 'staff'
     });
 
-    const isAdmin = profile.role === 'admin' || isAdminDiscordId(discordId);
+    const isAdmin = profile.role === 'admin' || isAdminDiscordId(discordId, settings);
 
     const [modChecks, statsRows] = await Promise.all([
       selectRows('mod_checks', 'select=*&is_active=eq.true&order=created_at.desc&limit=1'),
@@ -67,7 +67,8 @@ export default async function handler(req, res) {
       transcripts,
       settings: {
         auth_guild_id: settings.auth_guild_id,
-        auth_role_id: settings.auth_role_id
+        auth_role_id: settings.auth_role_id,
+        admin_discord_ids: settings.admin_discord_ids || []
       }
     });
   } catch (error) {

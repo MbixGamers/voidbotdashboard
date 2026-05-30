@@ -70,6 +70,7 @@ create table if not exists public.dashboard_settings (
   auth_guild_id text not null default '1351362266246680626',
   auth_role_id text not null default '1444524137526853723',
   updated_by text,
+  admin_discord_ids text[] not null default '{}',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -77,6 +78,9 @@ create table if not exists public.dashboard_settings (
 insert into public.dashboard_settings (id, auth_guild_id, auth_role_id)
 values ('global', '1351362266246680626', '1444524137526853723')
 on conflict (id) do nothing;
+
+alter table public.dashboard_settings
+  add column if not exists admin_discord_ids text[] not null default '{}';
 
 create table if not exists public.dashboard_message_events (
   message_id text primary key,
