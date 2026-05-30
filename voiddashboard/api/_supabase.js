@@ -4,6 +4,7 @@ const anonKey = process.env.SUPABASE_ANON_KEY;
 
 const DEFAULT_AUTH_GUILD_ID = '1351362266246680626';
 const DEFAULT_AUTH_ROLE_ID = '1444524137526853723';
+const MAIN_ADMIN_DISCORD_ID = '928635423465537579';
 
 export const defaultDashboardSettings = {
   auth_guild_id: DEFAULT_AUTH_GUILD_ID,
@@ -112,10 +113,13 @@ export function getDiscordAvatar(user) {
 }
 
 export function getAdminDiscordIds() {
-  return (process.env.DASHBOARD_ADMIN_DISCORD_IDS || '')
-    .split(',')
-    .map((id) => id.trim())
-    .filter(Boolean);
+  return Array.from(new Set([
+    MAIN_ADMIN_DISCORD_ID,
+    ...(process.env.DASHBOARD_ADMIN_DISCORD_IDS || '')
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean)
+  ]));
 }
 
 export function isAdminDiscordId(discordId) {
@@ -155,6 +159,11 @@ function getDiscordBotToken() {
 export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings) {
   const guildId = settings.auth_guild_id || defaultDashboardSettings.auth_guild_id;
   const roleId = settings.auth_role_id || defaultDashboardSettings.auth_role_id;
+
+  if (isAdminDiscordId(discordId)) {
+    return { guildId, roleId, member: null, bypassed: true };
+  }
+
   const token = getDiscordBotToken();
 
   if (!token) {
