@@ -2,6 +2,14 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const anonKey = process.env.SUPABASE_ANON_KEY;
 
+const DEFAULT_AUTH_GUILD_ID = '1351362266246680626';
+const DEFAULT_AUTH_ROLE_ID = '1444524137526853723';
+
+export const defaultDashboardSettings = {
+  auth_guild_id: DEFAULT_AUTH_GUILD_ID,
+  auth_role_id: DEFAULT_AUTH_ROLE_ID
+};
+
 function requireEnv() {
   if (!supabaseUrl || !serviceRoleKey) throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
 }
@@ -112,6 +120,73 @@ export function getAdminDiscordIds() {
 
 export function isAdminDiscordId(discordId) {
   return getAdminDiscordIds().includes(discordId);
+}
+
+export async function getDashboardSettings() {
+  try {
+    const rows = await selectRows('dashboard_settings', 'select=*&id=eq.global&limit=1');
+    return {
+      ...defaultDashboardSettings,
+      ...(rows[0] || {})
+    };
+  } catch (error) {
+    if (error.statusCode === 404 || /dashboard_settings|relation/i.test(error.message || '')) {
+      return defaultDashboardSettings;
+    }
+    throw error;
+  }
+}
+
+export async function saveDashboardSettings(settings) {
+  const rows = await upsertRows('dashboard_settings', [{
+    id: 'global',
+    auth_guild_id: settings.auth_guild_id || defaultDashboardSettings.auth_guild_id,
+    auth_role_id: settings.auth_role_id || defaultDashboardSettings.auth_role_id,
+    updated_by: settings.updated_by || null,
+    updated_at: new Date().toISOString()
+  }], 'id');
+  return rows[0];
+}
+
+function getDiscordBotToken() {
+  return process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN || null;
+}
+
+export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings) {
+  const guildId = settings.auth_guild_id || defaultDashboardSettings.auth_guild_id;
+  const roleId = settings.auth_role_id || defaultDashboardSettings.auth_role_id;
+  const token = getDiscordBotToken();
+
+  if (!token) {
+    const error = new Error('Dashboard staff verification is not configured. Add DISCORD_BOT_TOKEN to the dashboard environment.');
+    error.statusCode = 503;
+    throw error;
+  }
+
+  const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
+    headers: { Authorization: `Bot ${token}` }
+  });
+
+  if (response.status === 404 || response.status === 403) {
+    const error = new Error('Invalid staff authorization: you are not a Void staff member or do not have the required authority.');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const member = await response.json().catch(() => null);
+  if (!response.ok) {
+    const error = new Error(member?.message || 'Could not verify Discord server membership');
+    error.statusCode = response.status;
+    throw error;
+  }
+
+  if (!Array.isArray(member?.roles) || !member.roles.includes(roleId)) {
+    const error = new Error('Invalid staff authorization: you are not a staff member or do not have the required authority.');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  return { guildId, roleId, member };
 }
 
 export async function requireUser(req) {

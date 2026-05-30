@@ -64,3 +64,29 @@ alter table public.ticket_transcripts enable row level security;
 
 -- The Vercel API uses the service-role key for reads/writes after validating Supabase auth tokens.
 -- Keep browser clients blocked from direct table reads unless you intentionally add stricter RLS policies later.
+
+create table if not exists public.dashboard_settings (
+  id text primary key default 'global' check (id = 'global'),
+  auth_guild_id text not null default '1351362266246680626',
+  auth_role_id text not null default '1444524137526853723',
+  updated_by text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+insert into public.dashboard_settings (id, auth_guild_id, auth_role_id)
+values ('global', '1351362266246680626', '1444524137526853723')
+on conflict (id) do nothing;
+
+create table if not exists public.dashboard_message_events (
+  message_id text primary key,
+  discord_id text not null,
+  channel_id text,
+  guild_id text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists dashboard_message_events_staff_idx on public.dashboard_message_events(discord_id, created_at desc);
+
+alter table public.dashboard_settings enable row level security;
+alter table public.dashboard_message_events enable row level security;

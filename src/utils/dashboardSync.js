@@ -49,11 +49,15 @@ async function syncTicketClaim(user) {
   });
 }
 
-async function syncStaffMessage(user) {
+async function syncStaffMessage(user, message = null) {
   return postDashboardEvent('staff_stat', {
     ...userPayload(user),
     tickets_claimed_increment: 0,
-    messages_increment: 1
+    messages_increment: 1,
+    message_id: message?.id || null,
+    channel_id: message?.channelId || message?.channel?.id || null,
+    guild_id: message?.guildId || message?.guild?.id || null,
+    message_created_at: message?.createdAt?.toISOString?.() || new Date().toISOString()
   });
 }
 
