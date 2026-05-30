@@ -46,6 +46,10 @@ async function syncStaffStat(payload) {
 
   const ticketIncrement = Number(payload.tickets_claimed_increment || 0);
   let messageIncrement = Number(payload.messages_increment || 0);
+  const hasAbsoluteTicketTotal = payload.tickets_claimed_total !== undefined;
+  const hasAbsoluteTicketWeek = payload.tickets_claimed_week !== undefined;
+  const hasAbsoluteMessageTotal = payload.messages_total !== undefined;
+  const hasAbsoluteMessageWeek = payload.messages_week !== undefined;
 
   if (messageIncrement > 0) {
     const isNewMessage = await recordMessageEvent(payload);
@@ -69,10 +73,10 @@ async function syncStaffStat(payload) {
     username: payload.username || existing?.username || 'Discord User',
     avatar_url: payload.avatar_url || existing?.avatar_url || null,
     week_start: currentWeek,
-    tickets_claimed_total: Number(existing?.tickets_claimed_total || 0) + ticketIncrement,
-    tickets_claimed_week: (sameWeek ? Number(existing?.tickets_claimed_week || 0) : 0) + ticketIncrement,
-    messages_total: Number(existing?.messages_total || 0) + messageIncrement,
-    messages_week: (sameWeek ? Number(existing?.messages_week || 0) : 0) + messageIncrement,
+    tickets_claimed_total: hasAbsoluteTicketTotal ? Number(payload.tickets_claimed_total || 0) : Number(existing?.tickets_claimed_total || 0) + ticketIncrement,
+    tickets_claimed_week: hasAbsoluteTicketWeek ? Number(payload.tickets_claimed_week || 0) : (sameWeek ? Number(existing?.tickets_claimed_week || 0) : 0) + ticketIncrement,
+    messages_total: hasAbsoluteMessageTotal ? Number(payload.messages_total || 0) : Number(existing?.messages_total || 0) + messageIncrement,
+    messages_week: hasAbsoluteMessageWeek ? Number(payload.messages_week || 0) : (sameWeek ? Number(existing?.messages_week || 0) : 0) + messageIncrement,
     last_claimed_at: payload.last_claimed_at || (ticketIncrement > 0 ? new Date().toISOString() : existing?.last_claimed_at || null),
     updated_at: new Date().toISOString()
   }], 'discord_id');

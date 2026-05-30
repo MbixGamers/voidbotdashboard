@@ -196,6 +196,38 @@ function formatNumber(num) {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+
+async function findDashboardUser(client, userId) {
+  for (const guild of client.guilds.cache.values()) {
+    const member = guild.members.cache.get(userId) || await guild.members.fetch(userId).catch(() => null);
+    if (member?.user) return member.user;
+  }
+  return client.users.cache.get(userId) || await client.users.fetch(userId).catch(() => null);
+}
+
+async function syncDashboardSnapshots(client) {
+  if (!dashboardSync.isDashboardSyncConfigured()) return;
+
+  const userIds = new Set([...Object.keys(ticketCounts), ...Object.keys(messageCounts)]);
+  if (!userIds.size) return;
+
+  let synced = 0;
+  for (const userId of userIds) {
+    const user = await findDashboardUser(client, userId);
+    await dashboardSync.syncStaffSnapshot(user || { id: userId, username: 'Discord User' }, {
+      discord_id: userId,
+      username: user?.tag || user?.username || 'Discord User',
+      tickets_claimed_total: ticketCounts[userId] || 0,
+      tickets_claimed_week: ticketCounts[userId] || 0,
+      messages_total: messageCounts[userId] || 0,
+      messages_week: messageCounts[userId] || 0
+    });
+    synced++;
+  }
+
+  console.log(`✅ Synced ${synced} staff stat snapshot${synced === 1 ? '' : 's'} to the dashboard`);
+}
+
 // ==================== PRE-SCAN FUNCTION ====================
 async function preScanTicketChannels(client) {
   console.log('🔍 Pre-scanning ticket channels for staff replies...');
@@ -906,11 +938,16 @@ function initModStats(client) {
     loadRepliesCache()
   ]).then(() => {
     console.log('✅ Stats and cache loaded, starting pre-scan...');
+    syncDashboardSnapshots(client).catch(err => {
+      console.error('❌ Error syncing dashboard stat snapshots:', err);
+    });
     // Run pre-scan after loading cache
     setTimeout(() => {
-      preScanTicketChannels(client).catch(err => {
-        console.error('❌ Error during pre-scan:', err);
-      });
+      preScanTicketChannels(client)
+        .then(() => syncDashboardSnapshots(client))
+        .catch(err => {
+          console.error('❌ Error during pre-scan:', err);
+        });
     }, 5000); // Wait 5 seconds for guilds to be fully loaded
   });
 

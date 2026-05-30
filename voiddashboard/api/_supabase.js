@@ -8,7 +8,8 @@ const MAIN_ADMIN_DISCORD_ID = '928635423465537579';
 
 export const defaultDashboardSettings = {
   auth_guild_id: DEFAULT_AUTH_GUILD_ID,
-  auth_role_id: DEFAULT_AUTH_ROLE_ID
+  auth_role_id: DEFAULT_AUTH_ROLE_ID,
+  admin_discord_ids: []
 };
 
 function requireEnv() {
@@ -112,26 +113,39 @@ export function getDiscordAvatar(user) {
   return metadata.avatar_url || metadata.picture || null;
 }
 
-export function getAdminDiscordIds() {
+function normalizeDiscordIds(value) {
+  if (Array.isArray(value)) return value.map((id) => String(id).trim()).filter(Boolean);
+  if (typeof value === 'string') return value.split(/[\n,]+/).map((id) => id.trim()).filter(Boolean);
+  return [];
+}
+
+export function getConfiguredAdminDiscordIds(settings = null) {
+  return normalizeDiscordIds(settings?.admin_discord_ids);
+}
+
+export function getAdminDiscordIds(settings = null) {
   return Array.from(new Set([
     MAIN_ADMIN_DISCORD_ID,
     ...(process.env.DASHBOARD_ADMIN_DISCORD_IDS || '')
       .split(',')
       .map((id) => id.trim())
-      .filter(Boolean)
+      .filter(Boolean),
+    ...getConfiguredAdminDiscordIds(settings)
   ]));
 }
 
-export function isAdminDiscordId(discordId) {
-  return getAdminDiscordIds().includes(discordId);
+export function isAdminDiscordId(discordId, settings = null) {
+  return getAdminDiscordIds(settings).includes(discordId);
 }
 
 export async function getDashboardSettings() {
   try {
     const rows = await selectRows('dashboard_settings', 'select=*&id=eq.global&limit=1');
+    const row = rows[0] || {};
     return {
       ...defaultDashboardSettings,
-      ...(rows[0] || {})
+      ...row,
+      admin_discord_ids: normalizeDiscordIds(row.admin_discord_ids)
     };
   } catch (error) {
     if (error.statusCode === 404 || /dashboard_settings|relation/i.test(error.message || '')) {
@@ -146,6 +160,7 @@ export async function saveDashboardSettings(settings) {
     id: 'global',
     auth_guild_id: settings.auth_guild_id || defaultDashboardSettings.auth_guild_id,
     auth_role_id: settings.auth_role_id || defaultDashboardSettings.auth_role_id,
+    admin_discord_ids: normalizeDiscordIds(settings.admin_discord_ids).filter((id) => id !== MAIN_ADMIN_DISCORD_ID),
     updated_by: settings.updated_by || null,
     updated_at: new Date().toISOString()
   }], 'id');
@@ -160,7 +175,7 @@ export async function verifyDiscordStaffAccess(discordId, settings = defaultDash
   const guildId = settings.auth_guild_id || defaultDashboardSettings.auth_guild_id;
   const roleId = settings.auth_role_id || defaultDashboardSettings.auth_role_id;
 
-  if (isAdminDiscordId(discordId)) {
+  if (isAdminDiscordId(discordId, settings)) {
     return { guildId, roleId, member: null, bypassed: true };
   }
 

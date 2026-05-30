@@ -28,7 +28,8 @@ const fallbackDashboard = {
   ],
   settings: {
     auth_guild_id: '1351362266246680626',
-    auth_role_id: '1444524137526853723'
+    auth_role_id: '1444524137526853723',
+    admin_discord_ids: []
   },
   transcripts: [
     {
@@ -114,7 +115,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
-  const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100, auth_guild_id: '1351362266246680626', auth_role_id: '1444524137526853723' });
+  const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100, auth_guild_id: '1351362266246680626', auth_role_id: '1444524137526853723', admin_discord_ids: '' });
 
   const loadDashboard = useCallback(async (activeSession) => {
     if (!activeSession?.access_token) {
@@ -137,7 +138,8 @@ function App() {
         weekly_ticket_goal: data.modCheck?.weekly_ticket_goal || 0,
         message_goal: data.modCheck?.message_goal || 0,
         auth_guild_id: data.settings?.auth_guild_id || '1351362266246680626',
-        auth_role_id: data.settings?.auth_role_id || '1444524137526853723'
+        auth_role_id: data.settings?.auth_role_id || '1444524137526853723',
+        admin_discord_ids: (data.settings?.admin_discord_ids || []).join('\n')
       });
     } catch (error) {
       setNotice(error.message);
@@ -212,13 +214,14 @@ function App() {
           weekly_ticket_goal: Number(modForm.weekly_ticket_goal),
           message_goal: Number(modForm.message_goal),
           auth_guild_id: modForm.auth_guild_id,
-          auth_role_id: modForm.auth_role_id
+          auth_role_id: modForm.auth_role_id,
+          admin_discord_ids: modForm.admin_discord_ids
         })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save mod-check settings');
       setDashboard((current) => ({ ...current, modCheck: data.modCheck, settings: data.settings }));
-      setNotice('Dashboard requirements updated. Staff progress bars and authorization checks now use the new settings.');
+      setNotice('Dashboard requirements updated. Staff goals, authorization checks, and admin bypass IDs now use the new settings.');
     } catch (error) {
       setNotice(error.message);
     } finally {
@@ -383,7 +386,17 @@ function App() {
                       onChange={(event) => setModForm((current) => ({ ...current, auth_role_id: event.target.value.trim() }))}
                     />
                   </label>
+                  <label className="full-span">
+                    Admin bypass user IDs
+                    <textarea
+                      rows="4"
+                      placeholder="One Discord user ID per line. Your master admin ID is always kept automatically."
+                      value={modForm.admin_discord_ids}
+                      onChange={(event) => setModForm((current) => ({ ...current, admin_discord_ids: event.target.value }))}
+                    />
+                  </label>
                 </div>
+                <p className="muted">These Discord user IDs bypass the server/role check and receive the same admin dashboard access as the master admin.</p>
               </div>
               <button className="button button-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save dashboard settings'}</button>
             </form>
