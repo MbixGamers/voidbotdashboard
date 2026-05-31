@@ -135,8 +135,20 @@ function getAllChannels() {
   return channelsCache;
 }
 
+/**
+ * Returns all guild ticket setup configurations.
+ * @returns {Object}
+ */
+function getAllConfigs() {
+  return configCache;
+}
+
+function ensureLoaded() {
+  return loadPromise;
+}
+
 // Initialize on load
-load().catch(console.error);
+const loadPromise = load().catch(console.error);
 
 module.exports = {
   get,
@@ -145,5 +157,7 @@ module.exports = {
   getChannel,
   setChannel,
   delChannel,
-  getAllChannels
+  getAllChannels,
+  getAllConfigs,
+  ensureLoaded
 };

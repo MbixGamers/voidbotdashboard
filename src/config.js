@@ -31,5 +31,6 @@ module.exports = {
   // Dashboard & MongoDB
   dashboardBaseUrl: process.env.DASHBOARD_BASE_URL || null,
   dashboardApiKey: process.env.DASHBOARD_BOT_API_KEY || null,
+  dashboardStaffRoleId: process.env.DASHBOARD_AUTH_ROLE_ID || process.env.DASHBOARD_STAFF_ROLE_ID || '1444524137526853723',
   mongoUri: process.env.MONGODB_URI || null,
 };

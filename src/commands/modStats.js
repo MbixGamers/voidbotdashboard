@@ -5,6 +5,7 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder
 const fs = require('fs').promises;
 const path = require('path');
 const config = require('../config');
+const ticketConfig = require('../utils/ticketConfig');
 
 // ==================== CONFIG ====================
 const STATS_FILE = path.join(__dirname, '..', '..', 'stats.json');
@@ -15,8 +16,8 @@ const ITEMS_PER_PAGE = 10;
 const MEMBER_CACHE_TTL = 5 * 60 * 1000;
 const WRITE_DEBOUNCE_MS = 5000;
 
-// Updated ticket categories from user
-const TICKET_CATEGORIES = [
+// Ticket categories that should always count, plus all categories currently configured in ticketConfig.json.
+const FALLBACK_TICKET_CATEGORIES = [
   '1484047630785970186',
   '1484047738000769044',
   '1444542813080518791',
@@ -24,12 +25,15 @@ const TICKET_CATEGORIES = [
   '1444542784647331983'
 ];
 
-// Exception roles that count as "staff reply" but are not in trackedRoles
+// Exception roles that count as "staff reply" but are not in trackedRoles.
 const EXCEPTION_ROLES = [
   '1451325626928726076',
   '1453854535746588855',
   '1462873708178833576',
-  '1444524014818299926'
+  '1444524014818299926',
+  // Default dashboard staff role. Keep this in code so dashboard counters continue working
+  // even when TRACKED_ROLES is missing from the bot environment.
+  '1444524137526853723'
 ];
 
 // In-memory storage
@@ -147,11 +151,48 @@ function hasAdminAccess(member) {
          (config.adminRoleId && member.roles.cache.has(config.adminRoleId));
 }
 
+function getConfiguredTicketCategoryIds() {
+  const categoryIds = new Set(FALLBACK_TICKET_CATEGORIES);
+  for (const guildConfig of Object.values(ticketConfig.getAllConfigs())) {
+    for (const ticketType of guildConfig.ticketTypes || []) {
+      if (ticketType.categoryId) categoryIds.add(ticketType.categoryId);
+    }
+  }
+  return categoryIds;
+}
+
+function getConfiguredStaffRoleIds() {
+  const roleIds = new Set([...config.trackedRoles, ...EXCEPTION_ROLES]);
+  if (config.adminRoleId) roleIds.add(config.adminRoleId);
+  if (config.dashboardStaffRoleId) roleIds.add(config.dashboardStaffRoleId);
+
+  for (const guildConfig of Object.values(ticketConfig.getAllConfigs())) {
+    for (const ticketType of guildConfig.ticketTypes || []) {
+      for (const roleId of ticketType.pingRoles || []) {
+        if (roleId) roleIds.add(roleId);
+      }
+    }
+  }
+
+  return roleIds;
+}
+
+async function isTicketChannel(messageOrChannel) {
+  const channel = messageOrChannel?.channel || messageOrChannel;
+  if (!channel?.id) return false;
+
+  const channelData = await ticketConfig.getChannel(channel.id);
+  if (channelData && !channelData.closed) return true;
+
+  const categoryIds = getConfiguredTicketCategoryIds();
+  return Boolean(channel.parentId && categoryIds.has(channel.parentId));
+}
+
 function isStaff(member) {
   if (!member) return false;
-  const hasTracked = member.roles.cache.some(r => config.trackedRoles.includes(r.id));
-  const hasException = member.roles.cache.some(r => EXCEPTION_ROLES.includes(r.id));
-  return hasTracked || hasException;
+  if (hasAdminAccess(member)) return true;
+  const staffRoleIds = getConfiguredStaffRoleIds();
+  return member.roles.cache.some(r => staffRoleIds.has(r.id));
 }
 
 // Get list of relevant members, optionally excluding exceptions
@@ -170,7 +211,7 @@ async function getRelevantMembers(guild, includeExceptions = true) {
   }
 
   const members = [];
-  const roles = includeExceptions ? [...config.trackedRoles, ...EXCEPTION_ROLES] : config.trackedRoles;
+  const roles = includeExceptions ? [...getConfiguredStaffRoleIds()] : config.trackedRoles;
   for (const roleId of roles) {
     const role = guild.roles.cache.get(roleId);
     if (!role) continue;
@@ -243,7 +284,7 @@ async function preScanTicketChannels(client) {
   
   for (const guild of client.guilds.cache.values()) {
     // Initialize category stats for this guild
-    for (const categoryId of TICKET_CATEGORIES) {
+    for (const categoryId of getConfiguredTicketCategoryIds()) {
       const category = guild.channels.cache.get(categoryId);
       if (category) {
         categoryStats.total[categoryId] = 0;
@@ -252,7 +293,7 @@ async function preScanTicketChannels(client) {
       }
     }
     
-    for (const categoryId of TICKET_CATEGORIES) {
+    for (const categoryId of getConfiguredTicketCategoryIds()) {
       const category = guild.channels.cache.get(categoryId);
       if (!category) continue;
       
@@ -812,7 +853,7 @@ async function handleTicketscan(interaction, page = 0) {
     const categoryStats = {}; // Store stats per category for this guild
     
     // Initialize category stats
-    for (const categoryId of TICKET_CATEGORIES) {
+    for (const categoryId of getConfiguredTicketCategoryIds()) {
       const category = guild.channels.cache.get(categoryId);
       if (category) {
         categoryMap.set(categoryId, category.name);
@@ -826,7 +867,7 @@ async function handleTicketscan(interaction, page = 0) {
     }
     
     // Scan channels
-    for (const categoryId of TICKET_CATEGORIES) {
+    for (const categoryId of getConfiguredTicketCategoryIds()) {
       const category = guild.channels.cache.get(categoryId);
       if (!category) continue;
       
@@ -927,12 +968,12 @@ async function handleTicketscanPage(interaction, page) {
 // ==================== EVENT HANDLERS ====================
 function initModStats(client) {
   if (!config.trackedRoles.length) {
-    console.warn('⚠️ No TRACKED_ROLES set, mod stats disabled.');
-    return;
+    console.warn('⚠️ No TRACKED_ROLES set; mod stats will still count admins, dashboard staff, exception roles, and ticket ping roles.');
   }
 
   // Load all data first
   Promise.all([
+    ticketConfig.ensureLoaded(),
     loadStats(),
     loadProcessedMessages(),
     loadRepliesCache()
@@ -963,11 +1004,13 @@ function initModStats(client) {
     const member = message.member || await message.guild?.members.fetch(message.author.id).catch(() => null);
     const relevant = isStaff(member);
 
-    // Check if this message is in a ticket category
-    const isTicketChannel = message.channel.parentId && TICKET_CATEGORIES.includes(message.channel.parentId);
+    // Count configured ticket channels, including channels recorded in ticketChannels.json and
+    // any current ticket category from ticketConfig.json. This keeps the dashboard counter working
+    // after ticket categories are edited without requiring code changes.
+    const inTicketChannel = await isTicketChannel(message);
 
     // Track staff messages only inside ticket channels so dashboard goals match ticket support activity.
-    if (isTicketChannel && relevant && !processedMessages.has(message.id)) {
+    if (inTicketChannel && relevant && !processedMessages.has(message.id)) {
       processedMessages.add(message.id);
       messageCounts[message.author.id] = (messageCounts[message.author.id] || 0) + 1;
       scheduleWrite();
@@ -975,7 +1018,7 @@ function initModStats(client) {
       dashboardSync.syncStaffMessage(message.author, message).catch(() => {});
     }
     
-    if (isTicketChannel && relevant) {
+    if (inTicketChannel && relevant) {
       const channelId = message.channel.id;
       
       // Initialize the Set for this channel if it doesn't exist
@@ -1025,5 +1068,9 @@ module.exports = {
   initModStats,
   incrementClaimedTicket,
   // Export for testing
-  preScanTicketChannels
+  preScanTicketChannels,
+  isStaff,
+  isTicketChannel,
+  getConfiguredTicketCategoryIds,
+  getConfiguredStaffRoleIds
 };
