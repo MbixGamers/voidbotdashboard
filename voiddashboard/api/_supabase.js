@@ -4,11 +4,13 @@ const anonKey = process.env.SUPABASE_ANON_KEY;
 
 const DEFAULT_AUTH_GUILD_ID = '1351362266246680626';
 const DEFAULT_AUTH_ROLE_ID = '1444524137526853723';
+const ENV_AUTH_GUILD_ID = process.env.DASHBOARD_AUTH_GUILD_ID || process.env.DISCORD_GUILD_ID || null;
+const ENV_AUTH_ROLE_IDS = process.env.DASHBOARD_AUTH_ROLE_IDS || process.env.DASHBOARD_AUTH_ROLE_ID || process.env.DASHBOARD_STAFF_ROLE_ID || null;
 const MAIN_ADMIN_DISCORD_ID = '928635423465537579';
 
 export const defaultDashboardSettings = {
-  auth_guild_id: DEFAULT_AUTH_GUILD_ID,
-  auth_role_id: DEFAULT_AUTH_ROLE_ID,
+  auth_guild_id: ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID,
+  auth_role_id: ENV_AUTH_ROLE_IDS || DEFAULT_AUTH_ROLE_ID,
   admin_discord_ids: []
 };
 
@@ -119,6 +121,19 @@ function normalizeDiscordIds(value) {
   return [];
 }
 
+function normalizeRoleIds(value) {
+  return normalizeDiscordIds(value);
+}
+
+function getConfiguredAuthGuildId(row = {}) {
+  return ENV_AUTH_GUILD_ID || row.auth_guild_id || DEFAULT_AUTH_GUILD_ID;
+}
+
+export function getConfiguredAuthRoleIds(settings = {}) {
+  const ids = normalizeRoleIds(ENV_AUTH_ROLE_IDS || settings.auth_role_ids || settings.auth_role_id || DEFAULT_AUTH_ROLE_ID);
+  return ids.length ? ids : [DEFAULT_AUTH_ROLE_ID];
+}
+
 export function getConfiguredAdminDiscordIds(settings = null) {
   return normalizeDiscordIds(settings?.admin_discord_ids);
 }
@@ -142,18 +157,25 @@ export async function getDashboardSettings() {
   try {
     const rows = await selectRows('dashboard_settings', 'select=*&id=eq.global&limit=1');
     const row = rows[0] || {};
-    // Always ensure auth_guild_id and auth_role_id are set, with explicit defaults
+    const authRoleIds = getConfiguredAuthRoleIds(row);
     return {
       ...defaultDashboardSettings,
       ...row,
-      auth_guild_id: row.auth_guild_id || DEFAULT_AUTH_GUILD_ID,
-      auth_role_id: row.auth_role_id || DEFAULT_AUTH_ROLE_ID,
+      auth_guild_id: getConfiguredAuthGuildId(row),
+      auth_role_id: authRoleIds.join(','),
+      auth_role_ids: authRoleIds,
       admin_discord_ids: normalizeDiscordIds(row.admin_discord_ids)
     };
   } catch (error) {
     if (error.statusCode === 404 || /dashboard_settings|relation/i.test(error.message || '')) {
-      console.log('Dashboard settings not found in database, using defaults:', defaultDashboardSettings);
-      return defaultDashboardSettings;
+      const authRoleIds = getConfiguredAuthRoleIds(defaultDashboardSettings);
+      const settings = {
+        ...defaultDashboardSettings,
+        auth_role_id: authRoleIds.join(','),
+        auth_role_ids: authRoleIds
+      };
+      console.log('Dashboard settings not found in database, using defaults:', settings);
+      return settings;
     }
     throw error;
   }
@@ -162,8 +184,8 @@ export async function getDashboardSettings() {
 export async function saveDashboardSettings(settings) {
   const rows = await upsertRows('dashboard_settings', [{
     id: 'global',
-    auth_guild_id: settings.auth_guild_id || DEFAULT_AUTH_GUILD_ID,
-    auth_role_id: settings.auth_role_id || DEFAULT_AUTH_ROLE_ID,
+    auth_guild_id: settings.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID,
+    auth_role_id: getConfiguredAuthRoleIds(settings).join(','),
     admin_discord_ids: normalizeDiscordIds(settings.admin_discord_ids).filter((id) => id !== MAIN_ADMIN_DISCORD_ID),
     updated_by: settings.updated_by || null,
     updated_at: new Date().toISOString()
@@ -175,18 +197,7 @@ function getDiscordBotToken() {
   return process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN || null;
 }
 
-export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings) {
-  // Check if user is admin first - admins bypass Discord role verification
-  if (isAdminDiscordId(discordId, settings)) {
-    const guildId = settings?.auth_guild_id || DEFAULT_AUTH_GUILD_ID;
-    const roleId = String(settings?.auth_role_id || DEFAULT_AUTH_ROLE_ID);
-    return { guildId, roleId, member: null, bypassed: true };
-  }
-
-  // Use the settings passed in, with explicit fallback to defaults
-  const guildId = settings?.auth_guild_id || DEFAULT_AUTH_GUILD_ID;
-  const roleId = String(settings?.auth_role_id || DEFAULT_AUTH_ROLE_ID); // Ensure it's a string
-
+export async function fetchDiscordGuildMember(guildId, discordId) {
   const token = getDiscordBotToken();
 
   if (!token) {
@@ -198,21 +209,50 @@ export async function verifyDiscordStaffAccess(discordId, settings = defaultDash
   const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
     headers: { Authorization: `Bot ${token}` }
   });
-
-  if (response.status === 404 || response.status === 403) {
-    const error = new Error('Invalid staff authorization: you are not a Void staff member or do not have the required authority.');
-    error.statusCode = 403;
-    throw error;
-  }
-
   const member = await response.json().catch(() => null);
+
   if (!response.ok) {
     const error = new Error(member?.message || 'Could not verify Discord server membership');
     error.statusCode = response.status;
     throw error;
   }
 
-  // Fix: Ensure roles array exists and convert roleId to string for comparison
+  return member;
+}
+
+export function getDiscordMemberDisplayName(member, fallback = 'Discord User') {
+  return member?.nick || member?.user?.global_name || member?.user?.username || fallback;
+}
+
+export function getDiscordMemberAvatar(member) {
+  const avatarHash = member?.user?.avatar;
+  const userId = member?.user?.id;
+  if (!avatarHash || !userId) return null;
+  const extension = avatarHash.startsWith('a_') ? 'gif' : 'png';
+  return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${extension}?size=128`;
+}
+
+export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings) {
+  const guildId = settings?.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID;
+  const roleIds = getConfiguredAuthRoleIds(settings);
+
+  // Check if user is admin first - admins bypass Discord role verification.
+  if (isAdminDiscordId(discordId, settings)) {
+    return { guildId, roleIds, member: null, bypassed: true };
+  }
+
+  let member;
+  try {
+    member = await fetchDiscordGuildMember(guildId, discordId);
+  } catch (error) {
+    if (error.statusCode === 404 || error.statusCode === 403) {
+      const authError = new Error('Invalid staff authorization: you are not in the configured Discord server or do not have the required staff role.');
+      authError.statusCode = 403;
+      throw authError;
+    }
+    throw error;
+  }
+
   if (!Array.isArray(member?.roles)) {
     console.log(`Staff verification failed: member.roles is not an array. Received: ${JSON.stringify(member?.roles)}`);
     const error = new Error('Invalid staff authorization: you are not a staff member or do not have the required authority.');
@@ -220,15 +260,15 @@ export async function verifyDiscordStaffAccess(discordId, settings = defaultDash
     throw error;
   }
 
-  const hasRequiredRole = member.roles.includes(roleId);
+  const hasRequiredRole = roleIds.some((roleId) => member.roles.includes(roleId));
   if (!hasRequiredRole) {
-    console.log(`Staff verification failed. User roles: ${JSON.stringify(member.roles)}, Required role: ${roleId}`);
+    console.log(`Staff verification failed. Guild: ${guildId}, user roles: ${JSON.stringify(member.roles)}, required roles: ${JSON.stringify(roleIds)}`);
     const error = new Error('Invalid staff authorization: you are not a staff member or do not have the required authority.');
     error.statusCode = 403;
     throw error;
   }
 
-  return { guildId, roleId, member };
+  return { guildId, roleIds, member };
 }
 
 export async function requireUser(req) {

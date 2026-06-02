@@ -443,9 +443,12 @@ async function closeTicket(channel, closerId, reason, client) {
     const guild = channel.guild;
     const guildConfig = await ticketConfig.get(guild.id);
 
-    if (guildConfig) {
-      const transcriptChannel = guild.channels.cache.get(guildConfig.transcriptChannelId);
-      if (transcriptChannel) {
+    let transcriptMessage = null;
+    if (guildConfig?.transcriptChannelId) {
+      const transcriptChannel = guild.channels.cache.get(guildConfig.transcriptChannelId)
+        || await guild.channels.fetch(guildConfig.transcriptChannelId).catch(() => null);
+
+      if (transcriptChannel?.isTextBased?.()) {
         const embed = new EmbedBuilder()
           .setColor(Colors.DarkPurple)
           .setTitle('📄 Ticket Closed')
@@ -462,32 +465,39 @@ async function closeTicket(channel, closerId, reason, client) {
           embed.addFields({ name: '🙋 Claimed by', value: `<@${data.claimedBy}>`, inline: true });
         }
 
-        const transcriptMessage = await transcriptChannel.send({ embeds: [embed], files: [transcriptFile] }).catch(() => null);
-        const opener = await client.users.fetch(data.openerId).catch(() => null);
-        const claimedBy = data.claimedBy ? await client.users.fetch(data.claimedBy).catch(() => null) : null;
-        const closer = await client.users.fetch(closerId).catch(() => null);
-
-        dashboardSync.syncTicketTranscript({
-          ticket_channel_id: channel.id,
-          guild_id: guild.id,
-          ticket_channel_name: channel.name,
-          ticket_type: data.type,
-          opener_id: data.openerId,
-          opener_username: opener?.tag || opener?.username || data.openerId,
-          claimed_by: data.claimedBy || null,
-          claimed_by_username: claimedBy?.tag || claimedBy?.username || null,
-          closed_by: closerId,
-          closer_username: closer?.tag || closer?.username || closerId,
-          close_reason: reason,
-          transcript_text: transcriptFile.attachment.toString('utf8'),
-          discord_message_url: transcriptMessage?.url || null,
-          closed_at: new Date().toISOString(),
-          metadata: {
-            transcript_file_name: transcriptFile.name
-          }
-        }).catch(() => {});
+        transcriptMessage = await transcriptChannel.send({ embeds: [embed], files: [transcriptFile] }).catch((error) => {
+          console.warn('⚠️ Failed to send ticket transcript to Discord transcript channel:', error.message);
+          return null;
+        });
+      } else {
+        console.warn(`⚠️ Transcript channel ${guildConfig.transcriptChannelId} was not found or is not text-based; saving dashboard transcript only.`);
       }
     }
+
+    const opener = await client.users.fetch(data.openerId).catch(() => null);
+    const claimedBy = data.claimedBy ? await client.users.fetch(data.claimedBy).catch(() => null) : null;
+    const closer = await client.users.fetch(closerId).catch(() => null);
+
+    await dashboardSync.syncTicketTranscript({
+      ticket_channel_id: channel.id,
+      guild_id: guild.id,
+      ticket_channel_name: channel.name,
+      ticket_type: data.type,
+      opener_id: data.openerId,
+      opener_username: opener?.tag || opener?.globalName || opener?.username || data.openerId,
+      claimed_by: data.claimedBy || null,
+      claimed_by_username: claimedBy?.tag || claimedBy?.globalName || claimedBy?.username || null,
+      closed_by: closerId,
+      closer_username: closer?.tag || closer?.globalName || closer?.username || closerId,
+      close_reason: reason,
+      transcript_text: transcriptFile.attachment.toString('utf8'),
+      discord_message_url: transcriptMessage?.url || null,
+      closed_at: new Date().toISOString(),
+      metadata: {
+        transcript_file_name: transcriptFile.name,
+        discord_transcript_channel_id: guildConfig?.transcriptChannelId || null
+      }
+    });
 
     // Clear any active timers for this ticket
     if (global.ticketTimers && global.ticketTimers.has(channel.id)) {

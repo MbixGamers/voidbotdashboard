@@ -61,6 +61,9 @@ SUPABASE_ANON_KEY=<Supabase anon key>
 SUPABASE_SERVICE_ROLE_KEY=<Supabase service role key>
 DASHBOARD_BOT_API_KEY=<generate a long random secret>
 DASHBOARD_ADMIN_DISCORD_IDS=<comma-separated Discord user IDs for admins>
+DISCORD_BOT_TOKEN=<production bot token, used server-side to verify Discord roles>
+DASHBOARD_AUTH_GUILD_ID=<production Discord server ID>
+DASHBOARD_AUTH_ROLE_IDS=<comma-separated staff/admin role IDs allowed to open the dashboard>
 ```
 
 `VITE_*` values are public browser values. `SUPABASE_SERVICE_ROLE_KEY` and `DASHBOARD_BOT_API_KEY` must remain server-only Vercel variables.
@@ -72,9 +75,11 @@ Add these environment variables to the bot host:
 ```text
 DASHBOARD_BASE_URL=https://your-dashboard.vercel.app
 DASHBOARD_BOT_API_KEY=<same long random secret used on Vercel>
+DASHBOARD_MAX_TRANSCRIPT_CHARS=900000
+DASHBOARD_SYNC_TIMEOUT_MS=10000
 ```
 
-When staff claim tickets, send messages, or close tickets, the bot now sends events to the dashboard API. Closed tickets are stored as transcripts and include the Discord ticket-log message URL when Discord returns it.
+When staff claim tickets, send messages, or close tickets, the bot now sends events to the dashboard API. Closed tickets are stored as transcripts even if the Discord transcript channel cannot be found, and include the Discord ticket-log message URL when Discord returns it. Very large transcripts are trimmed before dashboard sync by `DASHBOARD_MAX_TRANSCRIPT_CHARS` so the API request is not rejected; the full transcript remains in the Discord attachment when that channel send succeeds.
 
 ## Local development
 

@@ -313,7 +313,7 @@ function App() {
           <h1>A clean command center for ticket support performance.</h1>
           <p>
             Track claims, ticket replies, weekly mod-check goals, and closed-ticket transcripts from one polished dashboard.
-            Discord authorization is verified against the Void Server and Ticket Support role before staff data is shown.
+            Discord authorization is verified against the configured production server and staff role(s) before staff data is shown.
           </p>
           <div className="hero-tags">
             <span>Role-gated access</span>
@@ -344,7 +344,7 @@ function App() {
         <section className="invalid-card">
           <p className="eyebrow">Invalid authorization</p>
           <h2>You are not a staff member or do not have the required authority.</h2>
-          <p>Access requires membership in the configured Void Server and the configured Ticket Support role. If this is a mistake, ask an admin to update your Discord role or adjust the dashboard authorization settings.</p>
+          <p>Access requires membership in the configured Discord server and at least one configured staff role. If this is a mistake, ask an admin to update your Discord role or adjust the dashboard authorization settings.</p>
           <button className="button button-secondary" onClick={signOut}>Sign out</button>
         </section>
       ) : null}
@@ -429,9 +429,8 @@ function App() {
                     />
                   </label>
                   <label>
-                    Required role ID
+                    Required role ID(s)
                     <input
-                      inputMode="numeric"
                       value={modForm.auth_role_id}
                       onChange={(event) => setModForm((current) => ({ ...current, auth_role_id: event.target.value.trim() }))}
                     />
@@ -446,7 +445,7 @@ function App() {
                     />
                   </label>
                 </div>
-                <p className="muted">These Discord user IDs bypass the server/role check and receive the same admin dashboard access as the master admin.</p>
+                <p className="muted">Use one role ID, or comma-separate multiple staff role IDs. Admin bypass IDs skip the server/role check and receive the same admin dashboard access as the master admin.</p>
               </div>
               <button className="button button-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save dashboard settings'}</button>
             </form>
