@@ -116,6 +116,7 @@ function App() {
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
   const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100, auth_guild_id: '1351362266246680626', auth_role_id: '1444524137526853723', admin_discord_ids: '' });
+  const [refreshingStaff, setRefreshingStaff] = useState(false);
 
   const loadDashboard = useCallback(async (activeSession) => {
     if (!activeSession?.access_token) {
@@ -148,6 +149,33 @@ function App() {
     }
   }, []);
 
+  const refreshStaffLeaderboard = useCallback(async (activeSession) => {
+    if (!activeSession?.access_token) return;
+
+    setRefreshingStaff(true);
+    try {
+      const response = await fetch('/api/dashboard', {
+        headers: {
+          Authorization: `Bearer ${activeSession.access_token}`
+        }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not refresh staff data');
+      
+      // Update only the staff leaderboard and transcripts
+      setDashboard((current) => ({
+        ...current,
+        staff: data.staff || [],
+        transcripts: data.transcripts || current.transcripts,
+        stats: data.stats || current.stats
+      }));
+    } catch (error) {
+      console.error('Failed to refresh staff leaderboard:', error);
+    } finally {
+      setRefreshingStaff(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
@@ -168,6 +196,17 @@ function App() {
 
     return () => listener.subscription.unsubscribe();
   }, [loadDashboard]);
+
+  // Auto-refresh staff data and transcripts every 10 seconds when admin is viewing
+  useEffect(() => {
+    if (!session || !dashboard.isAdmin || !session.access_token) return;
+
+    const interval = setInterval(() => {
+      refreshStaffLeaderboard(session);
+    }, 10000); // Refresh every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [session, dashboard.isAdmin, refreshStaffLeaderboard]);
 
   const stats = dashboard.stats || {};
   const modCheck = dashboard.modCheck || {};
@@ -222,6 +261,11 @@ function App() {
       if (!response.ok) throw new Error(data.error || 'Could not save mod-check settings');
       setDashboard((current) => ({ ...current, modCheck: data.modCheck, settings: data.settings }));
       setNotice('Dashboard requirements updated. Staff goals, authorization checks, and admin bypass IDs now use the new settings.');
+      
+      // Refresh staff leaderboard after settings change
+      setTimeout(() => {
+        refreshStaffLeaderboard(session);
+      }, 500);
     } catch (error) {
       setNotice(error.message);
     } finally {
@@ -294,7 +338,7 @@ function App() {
         <section className="invalid-card">
           <p className="eyebrow">Invalid authorization</p>
           <h2>You are not a staff member or do not have the required authority.</h2>
-          <p>Access requires membership in the configured Void Server and the configured Ticket Support role. If this is a mistake, ask an admin to update your Discord role or adjust the dashboard authorization IDs.</p>
+          <p>Access requires membership in the configured Void Server and the configured Ticket Support role. If this is a mistake, ask an admin to update your Discord role or adjust the dashboard authorization settings.</p>
           <button className="button button-secondary" onClick={signOut}>Sign out</button>
         </section>
       ) : null}
@@ -403,7 +447,7 @@ function App() {
             <div className="staff-table-card">
               <div className="table-title">
                 <strong>Staff leaderboard</strong>
-                <span>This week</span>
+                <span>This week {refreshingStaff ? '(updating…)' : ''}</span>
               </div>
               <div className="staff-table">
                 <div className="table-row table-head"><span>Staff</span><span>Tickets</span><span>Messages</span></div>
