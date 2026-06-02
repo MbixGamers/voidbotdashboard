@@ -135,7 +135,7 @@ export function getAdminDiscordIds(settings = null) {
 }
 
 export function isAdminDiscordId(discordId, settings = null) {
-  return getAdminDiscordIds(settings).includes(discordId);
+  return getAdminDiscordIds(settings).includes(String(discordId));
 }
 
 export async function getDashboardSettings() {
@@ -176,13 +176,16 @@ function getDiscordBotToken() {
 }
 
 export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings) {
+  // Check if user is admin first - admins bypass Discord role verification
+  if (isAdminDiscordId(discordId, settings)) {
+    const guildId = settings?.auth_guild_id || DEFAULT_AUTH_GUILD_ID;
+    const roleId = String(settings?.auth_role_id || DEFAULT_AUTH_ROLE_ID);
+    return { guildId, roleId, member: null, bypassed: true };
+  }
+
   // Use the settings passed in, with explicit fallback to defaults
   const guildId = settings?.auth_guild_id || DEFAULT_AUTH_GUILD_ID;
   const roleId = String(settings?.auth_role_id || DEFAULT_AUTH_ROLE_ID); // Ensure it's a string
-
-  if (isAdminDiscordId(discordId, settings)) {
-    return { guildId, roleId, member: null, bypassed: true };
-  }
 
   const token = getDiscordBotToken();
 
