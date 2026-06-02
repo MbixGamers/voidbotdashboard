@@ -19,7 +19,9 @@ export default async function handler(req, res) {
   try {
     const { discordId } = await requireUser(req);
     const currentSettings = await getDashboardSettings();
-    await verifyDiscordStaffAccess(discordId, currentSettings);
+    await verifyDiscordStaffAccess(discordId, currentSettings, {
+      discordAccessToken: req.headers['x-discord-provider-token']
+    });
 
     if (!isAdminDiscordId(discordId, currentSettings)) {
       return sendJson(res, 403, { error: 'Only dashboard admins can update mod-check requirements' });

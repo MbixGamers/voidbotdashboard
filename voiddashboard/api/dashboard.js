@@ -57,7 +57,9 @@ export default async function handler(req, res) {
   try {
     const { user, discordId } = await requireUser(req);
     const settings = await getDashboardSettings();
-    const access = await verifyDiscordStaffAccess(discordId, settings);
+    const access = await verifyDiscordStaffAccess(discordId, settings, {
+      discordAccessToken: req.headers['x-discord-provider-token']
+    });
     const discordUsername = access.member ? getDiscordMemberDisplayName(access.member, getDiscordUsername(user)) : getDiscordUsername(user);
     const discordAvatar = access.member ? getDiscordMemberAvatar(access.member) || getDiscordAvatar(user) : getDiscordAvatar(user);
 
