@@ -178,7 +178,7 @@ function getDiscordBotToken() {
 export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings) {
   // Use the settings passed in, with explicit fallback to defaults
   const guildId = settings?.auth_guild_id || DEFAULT_AUTH_GUILD_ID;
-  const roleId = settings?.auth_role_id || DEFAULT_AUTH_ROLE_ID;
+  const roleId = String(settings?.auth_role_id || DEFAULT_AUTH_ROLE_ID); // Ensure it's a string
 
   if (isAdminDiscordId(discordId, settings)) {
     return { guildId, roleId, member: null, bypassed: true };
@@ -209,7 +209,17 @@ export async function verifyDiscordStaffAccess(discordId, settings = defaultDash
     throw error;
   }
 
-  if (!Array.isArray(member?.roles) || !member.roles.includes(roleId)) {
+  // Fix: Ensure roles array exists and convert roleId to string for comparison
+  if (!Array.isArray(member?.roles)) {
+    console.log(`Staff verification failed: member.roles is not an array. Received: ${JSON.stringify(member?.roles)}`);
+    const error = new Error('Invalid staff authorization: you are not a staff member or do not have the required authority.');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const hasRequiredRole = member.roles.includes(roleId);
+  if (!hasRequiredRole) {
+    console.log(`Staff verification failed. User roles: ${JSON.stringify(member.roles)}, Required role: ${roleId}`);
     const error = new Error('Invalid staff authorization: you are not a staff member or do not have the required authority.');
     error.statusCode = 403;
     throw error;
