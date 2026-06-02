@@ -1,15 +1,52 @@
 import {
+  fetchDiscordGuildMember,
   getDashboardSettings,
   getDiscordAvatar,
+  getDiscordMemberAvatar,
+  getDiscordMemberDisplayName,
   getDiscordUsername,
   handleApiError,
   isAdminDiscordId,
   requireUser,
   selectRows,
   sendJson,
+  updateRows,
   upsertProfile,
   verifyDiscordStaffAccess
 } from './_supabase.js';
+
+async function refreshStaffNames(staffRows, settings) {
+  if (!staffRows.length) return staffRows;
+
+  return Promise.all(staffRows.map(async (row) => {
+    try {
+      const member = await fetchDiscordGuildMember(settings.auth_guild_id, row.discord_id);
+      const username = getDiscordMemberDisplayName(member, row.username);
+      const avatarUrl = getDiscordMemberAvatar(member) || row.avatar_url;
+
+      if (username !== row.username || avatarUrl !== row.avatar_url) {
+        await Promise.all([
+          upsertProfile({
+            discord_id: row.discord_id,
+            username,
+            avatar_url: avatarUrl,
+            role: isAdminDiscordId(row.discord_id, settings) ? 'admin' : 'staff'
+          }),
+          updateRows('staff_stats', `discord_id=eq.${encodeURIComponent(row.discord_id)}`, {
+            username,
+            avatar_url: avatarUrl,
+            updated_at: new Date().toISOString()
+          })
+        ]);
+      }
+
+      return { ...row, username, avatar_url: avatarUrl };
+    } catch (error) {
+      console.warn(`Could not refresh Discord name for ${row.discord_id}:`, error.message);
+      return row;
+    }
+  }));
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -20,12 +57,14 @@ export default async function handler(req, res) {
   try {
     const { user, discordId } = await requireUser(req);
     const settings = await getDashboardSettings();
-    await verifyDiscordStaffAccess(discordId, settings);
+    const access = await verifyDiscordStaffAccess(discordId, settings);
+    const discordUsername = access.member ? getDiscordMemberDisplayName(access.member, getDiscordUsername(user)) : getDiscordUsername(user);
+    const discordAvatar = access.member ? getDiscordMemberAvatar(access.member) || getDiscordAvatar(user) : getDiscordAvatar(user);
 
     const profile = await upsertProfile({
       discord_id: discordId,
-      username: getDiscordUsername(user),
-      avatar_url: getDiscordAvatar(user),
+      username: discordUsername,
+      avatar_url: discordAvatar,
       role: isAdminDiscordId(discordId, settings) ? 'admin' : 'staff'
     });
 
@@ -41,9 +80,10 @@ export default async function handler(req, res) {
       : `select=*&or=(opener_id.eq.${discordId},claimed_by.eq.${discordId},closed_by.eq.${discordId})&order=closed_at.desc&limit=12`;
     const transcripts = await selectRows('ticket_transcripts', transcriptFilter);
 
-    const staff = isAdmin
+    const staffRows = isAdmin
       ? await selectRows('staff_stats', 'select=discord_id,username,avatar_url,tickets_claimed_total,tickets_claimed_week,messages_total,messages_week,last_claimed_at&order=tickets_claimed_week.desc&limit=50')
       : [];
+    const staff = isAdmin ? await refreshStaffNames(staffRows, settings) : [];
 
     return sendJson(res, 200, {
       profile,
