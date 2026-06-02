@@ -129,7 +129,8 @@ function App() {
     try {
       const response = await fetch('/api/dashboard', {
         headers: {
-          Authorization: `Bearer ${activeSession.access_token}`
+          Authorization: `Bearer ${activeSession.access_token}`,
+          ...(activeSession.provider_token ? { 'X-Discord-Provider-Token': activeSession.provider_token } : {})
         }
       });
       const data = await response.json();
@@ -156,7 +157,8 @@ function App() {
     try {
       const response = await fetch('/api/dashboard', {
         headers: {
-          Authorization: `Bearer ${activeSession.access_token}`
+          Authorization: `Bearer ${activeSession.access_token}`,
+          ...(activeSession.provider_token ? { 'X-Discord-Provider-Token': activeSession.provider_token } : {})
         }
       });
       const data = await response.json();
@@ -252,7 +254,8 @@ function App() {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(session.provider_token ? { 'X-Discord-Provider-Token': session.provider_token } : {})
         },
         body: JSON.stringify({
           weekly_ticket_goal: Number(modForm.weekly_ticket_goal),

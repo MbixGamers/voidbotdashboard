@@ -126,11 +126,11 @@ function normalizeRoleIds(value) {
 }
 
 function getConfiguredAuthGuildId(row = {}) {
-  return ENV_AUTH_GUILD_ID || row.auth_guild_id || DEFAULT_AUTH_GUILD_ID;
+  return row.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID;
 }
 
 export function getConfiguredAuthRoleIds(settings = {}) {
-  const ids = normalizeRoleIds(ENV_AUTH_ROLE_IDS || settings.auth_role_ids || settings.auth_role_id || DEFAULT_AUTH_ROLE_ID);
+  const ids = normalizeRoleIds(settings.auth_role_ids || settings.auth_role_id || ENV_AUTH_ROLE_IDS || DEFAULT_AUTH_ROLE_ID);
   return ids.length ? ids : [DEFAULT_AUTH_ROLE_ID];
 }
 
@@ -220,6 +220,35 @@ export async function fetchDiscordGuildMember(guildId, discordId) {
   return member;
 }
 
+
+export async function fetchDiscordCurrentUserGuildMember(guildId, discordId, discordAccessToken) {
+  if (!discordAccessToken) return null;
+
+  const userResponse = await fetch('https://discord.com/api/v10/users/@me', {
+    headers: { Authorization: `Bearer ${discordAccessToken}` }
+  });
+  const user = await userResponse.json().catch(() => null);
+
+  if (!userResponse.ok || String(user?.id || '') !== String(discordId)) {
+    const error = new Error('Discord OAuth token did not match the signed-in dashboard user. Please sign out and sign in again.');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const response = await fetch(`https://discord.com/api/v10/users/@me/guilds/${guildId}/member`, {
+    headers: { Authorization: `Bearer ${discordAccessToken}` }
+  });
+  const member = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const error = new Error(member?.message || 'Could not verify Discord server membership from OAuth');
+    error.statusCode = response.status;
+    throw error;
+  }
+
+  return member;
+}
+
 export function getDiscordMemberDisplayName(member, fallback = 'Discord User') {
   return member?.nick || member?.user?.global_name || member?.user?.username || fallback;
 }
@@ -232,7 +261,7 @@ export function getDiscordMemberAvatar(member) {
   return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${extension}?size=128`;
 }
 
-export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings) {
+export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings, options = {}) {
   const guildId = settings?.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID;
   const roleIds = getConfiguredAuthRoleIds(settings);
 
@@ -242,15 +271,28 @@ export async function verifyDiscordStaffAccess(discordId, settings = defaultDash
   }
 
   let member;
+  let botVerificationError = null;
   try {
     member = await fetchDiscordGuildMember(guildId, discordId);
   } catch (error) {
-    if (error.statusCode === 404 || error.statusCode === 403) {
+    botVerificationError = error;
+  }
+
+  if (!member && options.discordAccessToken) {
+    try {
+      member = await fetchDiscordCurrentUserGuildMember(guildId, discordId, options.discordAccessToken);
+    } catch (error) {
+      if (!botVerificationError || ![403, 404].includes(Number(botVerificationError.statusCode))) throw error;
+    }
+  }
+
+  if (!member) {
+    if (botVerificationError && (botVerificationError.statusCode === 404 || botVerificationError.statusCode === 403)) {
       const authError = new Error('Invalid staff authorization: you are not in the configured Discord server or do not have the required staff role.');
       authError.statusCode = 403;
       throw authError;
     }
-    throw error;
+    throw botVerificationError || new Error('Could not verify Discord staff authorization');
   }
 
   if (!Array.isArray(member?.roles)) {

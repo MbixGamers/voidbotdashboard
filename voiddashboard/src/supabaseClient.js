@@ -23,6 +23,7 @@ function parseHashSession() {
   const session = {
     access_token: params.get('access_token'),
     refresh_token: params.get('refresh_token'),
+    provider_token: params.get('provider_token'),
     expires_at: params.get('expires_at'),
     token_type: params.get('token_type') || 'bearer'
   };
@@ -46,6 +47,7 @@ export const supabaseAuth = {
     const url = new URL(`${supabaseUrl}/auth/v1/authorize`);
     url.searchParams.set('provider', 'discord');
     url.searchParams.set('redirect_to', redirectTo);
+    url.searchParams.set('scopes', 'identify guilds guilds.members.read');
     window.location.href = url.toString();
   },
   async signOut() {
