@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     const transcripts = await selectRows('ticket_transcripts', transcriptFilter);
 
     const staff = isAdmin
-      ? await selectRows('staff_stats', 'select=discord_id,username,tickets_claimed_total,tickets_claimed_week,messages_total,messages_week,last_claimed_at&order=tickets_claimed_week.desc&limit=50')
+      ? await selectRows('staff_stats', 'select=discord_id,username,avatar_url,tickets_claimed_total,tickets_claimed_week,messages_total,messages_week,last_claimed_at&order=tickets_claimed_week.desc&limit=50')
       : [];
 
     return sendJson(res, 200, {
