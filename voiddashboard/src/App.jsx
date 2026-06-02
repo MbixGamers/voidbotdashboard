@@ -190,8 +190,12 @@ function App() {
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
-      if (nextSession) loadDashboard(nextSession);
-      else setLoading(false);
+      if (nextSession) {
+        setNotice(''); // Clear any previous auth errors when user logs in
+        loadDashboard(nextSession);
+      } else {
+        setLoading(false);
+      }
     });
 
     return () => listener.subscription.unsubscribe();
@@ -234,6 +238,7 @@ function App() {
     if (!supabase) return;
     await supabase.auth.signOut();
     setSession(null);
+    setNotice(''); // Clear any notices when signing out
   }
 
   async function saveModCheck(event) {
@@ -273,7 +278,8 @@ function App() {
     }
   }
 
-  const isAuthError = /invalid staff authorization|not a staff member|required authority|not a Void staff/i.test(notice);
+  // Only show auth error if there's a session AND an auth error message
+  const isAuthError = session && /invalid staff authorization|not a staff member|required authority|not a Void staff/i.test(notice);
   const showLogin = isSupabaseConfigured && !session;
   const showDashboard = !showLogin && !isAuthError;
 
