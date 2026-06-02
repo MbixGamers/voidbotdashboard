@@ -142,13 +142,17 @@ export async function getDashboardSettings() {
   try {
     const rows = await selectRows('dashboard_settings', 'select=*&id=eq.global&limit=1');
     const row = rows[0] || {};
+    // Always ensure auth_guild_id and auth_role_id are set, with explicit defaults
     return {
       ...defaultDashboardSettings,
       ...row,
+      auth_guild_id: row.auth_guild_id || DEFAULT_AUTH_GUILD_ID,
+      auth_role_id: row.auth_role_id || DEFAULT_AUTH_ROLE_ID,
       admin_discord_ids: normalizeDiscordIds(row.admin_discord_ids)
     };
   } catch (error) {
     if (error.statusCode === 404 || /dashboard_settings|relation/i.test(error.message || '')) {
+      console.log('Dashboard settings not found in database, using defaults:', defaultDashboardSettings);
       return defaultDashboardSettings;
     }
     throw error;
@@ -158,8 +162,8 @@ export async function getDashboardSettings() {
 export async function saveDashboardSettings(settings) {
   const rows = await upsertRows('dashboard_settings', [{
     id: 'global',
-    auth_guild_id: settings.auth_guild_id || defaultDashboardSettings.auth_guild_id,
-    auth_role_id: settings.auth_role_id || defaultDashboardSettings.auth_role_id,
+    auth_guild_id: settings.auth_guild_id || DEFAULT_AUTH_GUILD_ID,
+    auth_role_id: settings.auth_role_id || DEFAULT_AUTH_ROLE_ID,
     admin_discord_ids: normalizeDiscordIds(settings.admin_discord_ids).filter((id) => id !== MAIN_ADMIN_DISCORD_ID),
     updated_by: settings.updated_by || null,
     updated_at: new Date().toISOString()
@@ -172,8 +176,9 @@ function getDiscordBotToken() {
 }
 
 export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings) {
-  const guildId = settings.auth_guild_id || defaultDashboardSettings.auth_guild_id;
-  const roleId = settings.auth_role_id || defaultDashboardSettings.auth_role_id;
+  // Use the settings passed in, with explicit fallback to defaults
+  const guildId = settings?.auth_guild_id || DEFAULT_AUTH_GUILD_ID;
+  const roleId = settings?.auth_role_id || DEFAULT_AUTH_ROLE_ID;
 
   if (isAdminDiscordId(discordId, settings)) {
     return { guildId, roleId, member: null, bypassed: true };
