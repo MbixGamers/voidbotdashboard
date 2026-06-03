@@ -50,9 +50,11 @@ function userPayload(user) {
   };
 }
 
-async function syncTicketClaim(user) {
+async function syncTicketClaim(user, context = {}) {
   return postDashboardEvent('staff_stat', {
     ...userPayload(user),
+    guild_id: context.guild_id || context.guildId || context.guild?.id || null,
+    ticket_channel_id: context.ticket_channel_id || context.channel_id || context.channelId || null,
     tickets_claimed_increment: 1,
     messages_increment: 0,
     last_claimed_at: new Date().toISOString()
@@ -84,7 +86,8 @@ async function syncStaffSnapshot(user, stats = {}) {
     tickets_claimed_week: Number(stats.tickets_claimed_week || 0),
     messages_total: Number(stats.messages_total || 0),
     messages_week: Number(stats.messages_week || 0),
-    last_claimed_at: stats.last_claimed_at || null
+    last_claimed_at: stats.last_claimed_at || null,
+    guild_id: stats.guild_id || stats.guildId || null
   });
 }
 
