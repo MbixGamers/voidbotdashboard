@@ -346,7 +346,10 @@ async function handleClaim(interaction) {
 
     // Increment claimed tickets count for this staff member
     modStats.incrementClaimedTicket(interaction.user.id);
-    dashboardSync.syncTicketClaim(interaction.user).catch(() => {});
+    dashboardSync.syncTicketClaim(interaction.user, {
+      guild_id: interaction.guildId || interaction.guild?.id || data.guildId,
+      channel_id: channelId
+    }).catch(() => {});
 
     const message = interaction.message;
     if (message) {

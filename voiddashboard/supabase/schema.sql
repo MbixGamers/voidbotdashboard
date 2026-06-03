@@ -11,6 +11,7 @@ create table if not exists public.staff_stats (
   discord_id text primary key references public.profiles(discord_id) on delete cascade,
   username text not null,
   avatar_url text,
+  guild_id text,
   week_start date not null default date_trunc('week', now())::date,
   tickets_claimed_total integer not null default 0,
   tickets_claimed_week integer not null default 0,
@@ -53,7 +54,11 @@ create table if not exists public.ticket_transcripts (
   updated_at timestamptz not null default now()
 );
 
+alter table public.staff_stats
+  add column if not exists guild_id text;
+
 create index if not exists staff_stats_week_idx on public.staff_stats(week_start);
+create index if not exists staff_stats_guild_week_idx on public.staff_stats(guild_id, tickets_claimed_week desc, messages_week desc);
 create index if not exists transcripts_closed_at_idx on public.ticket_transcripts(closed_at desc);
 create index if not exists transcripts_people_idx on public.ticket_transcripts(opener_id, claimed_by, closed_by);
 

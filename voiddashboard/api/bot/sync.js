@@ -72,6 +72,7 @@ async function syncStaffStat(payload) {
     discord_id: payload.discord_id,
     username: payload.username || existing?.username || 'Discord User',
     avatar_url: payload.avatar_url || existing?.avatar_url || null,
+    guild_id: payload.guild_id || existing?.guild_id || null,
     week_start: currentWeek,
     tickets_claimed_total: hasAbsoluteTicketTotal ? Number(payload.tickets_claimed_total || 0) : Number(existing?.tickets_claimed_total || 0) + ticketIncrement,
     tickets_claimed_week: hasAbsoluteTicketWeek ? Number(payload.tickets_claimed_week || 0) : (sameWeek ? Number(existing?.tickets_claimed_week || 0) : 0) + ticketIncrement,
@@ -109,6 +110,18 @@ async function syncTranscript(payload) {
   return rows[0];
 }
 
+function getRequestBody(req) {
+  if (!req.body) return {};
+  if (typeof req.body === 'string' || Buffer.isBuffer(req.body)) {
+    try {
+      return JSON.parse(req.body.toString());
+    } catch {
+      return {};
+    }
+  }
+  return req.body;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -117,8 +130,9 @@ export default async function handler(req, res) {
 
   try {
     requireBotKey(req);
-    const event = req.body?.event;
-    const payload = req.body?.payload || {};
+    const body = getRequestBody(req);
+    const event = body?.event;
+    const payload = body?.payload || {};
 
     if (event === 'staff_stat') {
       const staffStat = await syncStaffStat(payload);

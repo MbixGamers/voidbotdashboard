@@ -241,7 +241,10 @@ function formatNumber(num) {
 async function findDashboardUser(client, userId) {
   for (const guild of client.guilds.cache.values()) {
     const member = guild.members.cache.get(userId) || await guild.members.fetch(userId).catch(() => null);
-    if (member?.user) return member.user;
+    if (member?.user) {
+      member.user.lastGuildId = guild.id;
+      return member.user;
+    }
   }
   return client.users.cache.get(userId) || await client.users.fetch(userId).catch(() => null);
 }
@@ -261,7 +264,8 @@ async function syncDashboardSnapshots(client) {
       tickets_claimed_total: ticketCounts[userId] || 0,
       tickets_claimed_week: ticketCounts[userId] || 0,
       messages_total: messageCounts[userId] || 0,
-      messages_week: messageCounts[userId] || 0
+      messages_week: messageCounts[userId] || 0,
+      guild_id: user?.lastGuildId || null
     });
     synced++;
   }
