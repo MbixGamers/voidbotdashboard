@@ -153,27 +153,25 @@ export function isAdminDiscordId(discordId, settings = null) {
   return getAdminDiscordIds(settings).includes(String(discordId));
 }
 
+function normalizeDashboardSettings(row = {}) {
+  const authRoleIds = getConfiguredAuthRoleIds(row);
+  return {
+    ...defaultDashboardSettings,
+    ...row,
+    auth_guild_id: getConfiguredAuthGuildId(row),
+    auth_role_id: authRoleIds.join(','),
+    auth_role_ids: authRoleIds,
+    admin_discord_ids: normalizeDiscordIds(row.admin_discord_ids)
+  };
+}
+
 export async function getDashboardSettings() {
   try {
     const rows = await selectRows('dashboard_settings', 'select=*&id=eq.global&limit=1');
-    const row = rows[0] || {};
-    const authRoleIds = getConfiguredAuthRoleIds(row);
-    return {
-      ...defaultDashboardSettings,
-      ...row,
-      auth_guild_id: getConfiguredAuthGuildId(row),
-      auth_role_id: authRoleIds.join(','),
-      auth_role_ids: authRoleIds,
-      admin_discord_ids: normalizeDiscordIds(row.admin_discord_ids)
-    };
+    return normalizeDashboardSettings(rows[0] || {});
   } catch (error) {
     if (error.statusCode === 404 || /dashboard_settings|relation/i.test(error.message || '')) {
-      const authRoleIds = getConfiguredAuthRoleIds(defaultDashboardSettings);
-      const settings = {
-        ...defaultDashboardSettings,
-        auth_role_id: authRoleIds.join(','),
-        auth_role_ids: authRoleIds
-      };
+      const settings = normalizeDashboardSettings(defaultDashboardSettings);
       console.log('Dashboard settings not found in database, using defaults:', settings);
       return settings;
     }
@@ -182,15 +180,16 @@ export async function getDashboardSettings() {
 }
 
 export async function saveDashboardSettings(settings) {
+  const authRoleIds = normalizeRoleIds(settings.auth_role_id || settings.auth_role_ids);
   const rows = await upsertRows('dashboard_settings', [{
     id: 'global',
-    auth_guild_id: settings.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID,
-    auth_role_id: getConfiguredAuthRoleIds(settings).join(','),
+    auth_guild_id: String(settings.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID).trim(),
+    auth_role_id: (authRoleIds.length ? authRoleIds : getConfiguredAuthRoleIds(defaultDashboardSettings)).join(','),
     admin_discord_ids: normalizeDiscordIds(settings.admin_discord_ids).filter((id) => id !== MAIN_ADMIN_DISCORD_ID),
     updated_by: settings.updated_by || null,
     updated_at: new Date().toISOString()
   }], 'id');
-  return rows[0];
+  return normalizeDashboardSettings(rows[0] || {});
 }
 
 function getDiscordBotToken() {
@@ -261,6 +260,10 @@ export function getDiscordMemberAvatar(member) {
   return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${extension}?size=128`;
 }
 
+function memberHasAnyConfiguredRole(member, roleIds) {
+  return Array.isArray(member?.roles) && roleIds.some((roleId) => member.roles.includes(roleId));
+}
+
 export async function verifyDiscordStaffAccess(discordId, settings = defaultDashboardSettings, options = {}) {
   const guildId = settings?.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID;
   const roleIds = getConfiguredAuthRoleIds(settings);
@@ -270,42 +273,51 @@ export async function verifyDiscordStaffAccess(discordId, settings = defaultDash
     return { guildId, roleIds, member: null, bypassed: true };
   }
 
-  let member;
+  let member = null;
   let botVerificationError = null;
+  let oauthVerificationError = null;
+
   try {
     member = await fetchDiscordGuildMember(guildId, discordId);
   } catch (error) {
     botVerificationError = error;
   }
 
-  if (!member && options.discordAccessToken) {
+  // Discord/Supabase provider tokens are only available immediately after Discord OAuth sign-in.
+  // Use them as a second source of truth when the bot token is missing, stale, or returned a
+  // member payload that does not include the current staff roles. This prevents a valid staff
+  // member from being accepted once and then rejected on the next dashboard load because one
+  // verification path had stale role data.
+  if ((!member || !memberHasAnyConfiguredRole(member, roleIds)) && options.discordAccessToken) {
     try {
-      member = await fetchDiscordCurrentUserGuildMember(guildId, discordId, options.discordAccessToken);
+      const oauthMember = await fetchDiscordCurrentUserGuildMember(guildId, discordId, options.discordAccessToken);
+      if (memberHasAnyConfiguredRole(oauthMember, roleIds) || !member) member = oauthMember;
     } catch (error) {
-      if (!botVerificationError || ![403, 404].includes(Number(botVerificationError.statusCode))) throw error;
+      oauthVerificationError = error;
+      if (!member && (!botVerificationError || ![403, 404].includes(Number(botVerificationError.statusCode)))) throw error;
     }
   }
 
   if (!member) {
     if (botVerificationError && (botVerificationError.statusCode === 404 || botVerificationError.statusCode === 403)) {
-      const authError = new Error('Invalid staff authorization: you are not in the configured Discord server or do not have the required staff role.');
+      const authError = new Error('Invalid staff authorization: you are not in the configured Discord server or do not have one of the configured dashboard staff roles.');
       authError.statusCode = 403;
       throw authError;
     }
-    throw botVerificationError || new Error('Could not verify Discord staff authorization');
+    throw botVerificationError || oauthVerificationError || new Error('Could not verify Discord staff authorization');
   }
 
   if (!Array.isArray(member?.roles)) {
     console.log(`Staff verification failed: member.roles is not an array. Received: ${JSON.stringify(member?.roles)}`);
-    const error = new Error('Invalid staff authorization: you are not a staff member or do not have the required authority.');
+    const error = new Error('Invalid staff authorization: Discord did not return role data for this member. Make sure the dashboard requests guilds.members.read and the bot token can read guild members.');
     error.statusCode = 403;
     throw error;
   }
 
-  const hasRequiredRole = roleIds.some((roleId) => member.roles.includes(roleId));
+  const hasRequiredRole = memberHasAnyConfiguredRole(member, roleIds);
   if (!hasRequiredRole) {
     console.log(`Staff verification failed. Guild: ${guildId}, user roles: ${JSON.stringify(member.roles)}, required roles: ${JSON.stringify(roleIds)}`);
-    const error = new Error('Invalid staff authorization: you are not a staff member or do not have the required authority.');
+    const error = new Error('Invalid staff authorization: you are not a staff member or do not have one of the configured dashboard staff roles.');
     error.statusCode = 403;
     throw error;
   }

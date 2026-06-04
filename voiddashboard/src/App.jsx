@@ -268,6 +268,12 @@ function App() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save mod-check settings');
       setDashboard((current) => ({ ...current, modCheck: data.modCheck, settings: data.settings }));
+      setModForm((current) => ({
+        ...current,
+        auth_guild_id: data.settings?.auth_guild_id || current.auth_guild_id,
+        auth_role_id: data.settings?.auth_role_id || current.auth_role_id,
+        admin_discord_ids: (data.settings?.admin_discord_ids || []).join('\n')
+      }));
       setNotice('Dashboard requirements updated. Staff goals, authorization checks, and admin bypass IDs now use the new settings.');
       
       // Refresh staff leaderboard after settings change

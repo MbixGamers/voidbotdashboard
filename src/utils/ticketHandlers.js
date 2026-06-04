@@ -1,10 +1,52 @@
 // src/utils/ticketHandlers.js
 const { ChannelType, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, MessageFlags, Colors } = require('discord.js');
+const fs = require('fs').promises;
+const path = require('path');
 const ticketConfig = require('./ticketConfig');
 const guildConfig = require('./guildConfig');
 const config = require('../config');
 const modStats = require('../commands/modStats');
 const dashboardSync = require('./dashboardSync');
+
+const LOCAL_TRANSCRIPTS_DIR = path.join(__dirname, '..', '..', 'transcripts');
+const LOCAL_TRANSCRIPTS_INDEX = path.join(__dirname, '..', '..', 'ticket-transcripts.json');
+
+
+async function saveLocalTranscript(payload, transcriptFile) {
+  try {
+    await fs.mkdir(LOCAL_TRANSCRIPTS_DIR, { recursive: true });
+    const safeChannelName = String(payload.ticket_channel_name || payload.ticket_channel_id || 'ticket')
+      .replace(/[^a-z0-9-_]/gi, '-')
+      .slice(0, 80);
+    const fileName = `${payload.closed_at.replace(/[:.]/g, '-')}-${safeChannelName}-${payload.ticket_channel_id}.txt`;
+    const relativePath = path.join('transcripts', fileName);
+    const absolutePath = path.join(LOCAL_TRANSCRIPTS_DIR, fileName);
+    await fs.writeFile(absolutePath, transcriptFile.attachment, 'utf8');
+
+    let index = [];
+    try {
+      index = JSON.parse(await fs.readFile(LOCAL_TRANSCRIPTS_INDEX, 'utf8'));
+      if (!Array.isArray(index)) index = [];
+    } catch (error) {
+      if (error.code !== 'ENOENT') console.warn('⚠️ Could not read local transcript index:', error.message);
+    }
+
+    const record = {
+      ...payload,
+      local_file: relativePath.replace(/\\/g, '/'),
+      transcript_text: undefined,
+      updated_at: new Date().toISOString()
+    };
+    const existingIndex = index.findIndex((item) => item.ticket_channel_id === payload.ticket_channel_id);
+    if (existingIndex >= 0) index[existingIndex] = record;
+    else index.unshift(record);
+    await fs.writeFile(LOCAL_TRANSCRIPTS_INDEX, JSON.stringify(index.slice(0, 500), null, 2), 'utf8');
+    return relativePath;
+  } catch (error) {
+    console.error('saveLocalTranscript error:', error);
+    return null;
+  }
+}
 
 async function safeReply(interaction, content, options = {}) {
   try {
@@ -316,6 +358,9 @@ async function collectFilesInBackground(channelId, userId, expectedCount, client
 
 async function handleClaim(interaction) {
   try {
+    if (!interaction.deferred && !interaction.replied) {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral }).catch(() => {});
+    }
     // Check if interaction is still valid
     if (!interaction.channel) {
       console.log('Channel no longer exists for claim');
@@ -335,9 +380,10 @@ async function handleClaim(interaction) {
 
     const member = interaction.member;
     const allowedRoles = data.pingRoles || [];
-    const hasRole = allowedRoles.some(roleId => member.roles.cache.has(roleId));
-    if (!hasRole) {
-      await interaction.editReply({ content: 'You cannot claim this ticket.', ephemeral: true }).catch(() => {});
+    const hasTicketRole = allowedRoles.some(roleId => member.roles.cache.has(roleId));
+    const canClaim = hasTicketRole || modStats.isStaff(member);
+    if (!canClaim) {
+      await interaction.editReply({ content: 'You cannot claim this ticket because you do not have a configured ticket/staff role.' }).catch(() => {});
       return;
     }
 
@@ -481,7 +527,7 @@ async function closeTicket(channel, closerId, reason, client) {
     const claimedBy = data.claimedBy ? await client.users.fetch(data.claimedBy).catch(() => null) : null;
     const closer = await client.users.fetch(closerId).catch(() => null);
 
-    await dashboardSync.syncTicketTranscript({
+    const transcriptPayload = {
       ticket_channel_id: channel.id,
       guild_id: guild.id,
       ticket_channel_name: channel.name,
@@ -500,7 +546,14 @@ async function closeTicket(channel, closerId, reason, client) {
         transcript_file_name: transcriptFile.name,
         discord_transcript_channel_id: guildConfig?.transcriptChannelId || null
       }
-    });
+    };
+
+    const localTranscriptPath = await saveLocalTranscript(transcriptPayload, transcriptFile);
+    if (localTranscriptPath) {
+      transcriptPayload.metadata.local_transcript_path = localTranscriptPath.replace(/\\/g, '/');
+    }
+
+    await dashboardSync.syncTicketTranscript(transcriptPayload);
 
     // Clear any active timers for this ticket
     if (global.ticketTimers && global.ticketTimers.has(channel.id)) {

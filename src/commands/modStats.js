@@ -6,6 +6,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const config = require('../config');
 const ticketConfig = require('../utils/ticketConfig');
+const fastModStats = require('../utils/fastModStats');
 
 // ==================== CONFIG ====================
 const STATS_FILE = path.join(__dirname, '..', '..', 'stats.json');
@@ -1017,6 +1018,7 @@ function initModStats(client) {
     if (inTicketChannel && relevant && !processedMessages.has(message.id)) {
       processedMessages.add(message.id);
       messageCounts[message.author.id] = (messageCounts[message.author.id] || 0) + 1;
+      fastModStats.incrementMessageCount(message.author.id);
       scheduleWrite();
       saveProcessedMessages().catch(() => {});
       dashboardSync.syncStaffMessage(message.author, message).catch(() => {});
@@ -1034,6 +1036,7 @@ function initModStats(client) {
       const repliers = ticketChannelReplies.get(channelId);
       if (!repliers.has(message.author.id)) {
         repliers.add(message.author.id);
+        fastModStats.addStaffReply(channelId, message.author.id);
         scheduleRepliesWrite();
       }
     }
@@ -1051,6 +1054,7 @@ function initModStats(client) {
 // Export increment function for use in ticketHandlers
 function incrementClaimedTicket(userId) {
   ticketCounts[userId] = (ticketCounts[userId] || 0) + 1;
+  fastModStats.incrementTicketCount(userId);
   scheduleWrite();
 }
 
