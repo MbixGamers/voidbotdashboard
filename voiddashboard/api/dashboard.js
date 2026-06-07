@@ -1,5 +1,6 @@
 import {
   fetchDiscordGuildMember,
+  fetchDiscordGuildMembers,
   getConfiguredAuthRoleIds,
   getDashboardSettings,
   getDiscordAvatar,
@@ -26,6 +27,10 @@ function withGuildFilter(baseQuery, settings) {
   return guildFilter ? `${baseQuery}&${guildFilter}` : baseQuery;
 }
 
+function isCurrentGuildStat(row, settings) {
+  return !settings?.auth_guild_id || !row.guild_id || row.guild_id === settings.auth_guild_id;
+}
+
 function hasRequiredDashboardRole(member, row, settings) {
   if (isAdminDiscordId(row.discord_id, settings)) return true;
   if (!Array.isArray(member?.roles)) return false;
@@ -37,9 +42,14 @@ async function refreshStaffNames(staffRows, settings) {
   if (!staffRows.length) return staffRows;
 
   const refreshedRows = await Promise.all(staffRows.map(async (row) => {
+    if (row.verified_staff) {
+      const { verified_staff: verifiedStaff, ...staffRow } = row;
+      return staffRow;
+    }
+
     try {
       const member = await fetchDiscordGuildMember(settings.auth_guild_id, row.discord_id);
-      if (!hasRequiredDashboardRole(member, row, settings)) return null;
+      if (!hasRequiredDashboardRole(member, row, settings)) return isAdminDiscordId(row.discord_id, settings) ? row : null;
 
       const username = getDiscordMemberDisplayName(member, row.username);
       const avatarUrl = getDiscordMemberAvatar(member) || row.avatar_url;
@@ -64,11 +74,63 @@ async function refreshStaffNames(staffRows, settings) {
       return { ...row, username, avatar_url: avatarUrl, guild_id: settings.auth_guild_id };
     } catch (error) {
       console.warn(`Could not refresh Discord name for ${row.discord_id}:`, error.message);
-      return null;
+      return row;
     }
   }));
 
   return refreshedRows.filter(Boolean);
+}
+
+async function fetchStaffDirectory(settings) {
+  if (!settings?.auth_guild_id) return [];
+
+  try {
+    const roleIds = getConfiguredAuthRoleIds(settings);
+    const members = await fetchDiscordGuildMembers(settings.auth_guild_id);
+
+    return members
+      .filter((member) => Array.isArray(member?.roles) && roleIds.some((roleId) => member.roles.includes(roleId)))
+      .map((member) => ({
+        discord_id: member.user.id,
+        username: getDiscordMemberDisplayName(member, member.user.username || 'Discord User'),
+        avatar_url: getDiscordMemberAvatar(member),
+        guild_id: settings.auth_guild_id,
+        tickets_claimed_total: 0,
+        tickets_claimed_week: 0,
+        messages_total: 0,
+        messages_week: 0,
+        last_claimed_at: null,
+        verified_staff: true
+      }));
+  } catch (error) {
+    console.warn('Could not load Discord staff directory for leaderboard:', error.message);
+    return [];
+  }
+}
+
+function mergeStaffRows(statsRows, directoryRows, settings) {
+  const staffById = new Map();
+
+  for (const row of directoryRows) {
+    staffById.set(row.discord_id, row);
+  }
+
+  for (const row of statsRows.filter((stat) => isCurrentGuildStat(stat, settings))) {
+    const directoryRow = staffById.get(row.discord_id);
+    staffById.set(row.discord_id, {
+      ...(directoryRow || {}),
+      ...row,
+      username: directoryRow?.username || row.username,
+      avatar_url: directoryRow?.avatar_url || row.avatar_url,
+      guild_id: directoryRow?.guild_id || row.guild_id || settings.auth_guild_id
+    });
+  }
+
+  return Array.from(staffById.values()).sort((a, b) => (
+    Number(b.tickets_claimed_week || 0) - Number(a.tickets_claimed_week || 0)
+    || Number(b.messages_week || 0) - Number(a.messages_week || 0)
+    || String(a.username || a.discord_id).localeCompare(String(b.username || b.discord_id))
+  ));
 }
 
 export default async function handler(req, res) {
@@ -106,10 +168,13 @@ export default async function handler(req, res) {
       : `${withGuildFilter(`select=*&or=(opener_id.eq.${discordId},claimed_by.eq.${discordId},closed_by.eq.${discordId})&order=closed_at.desc&limit=12`, settings)}`;
     const transcripts = await selectRows('ticket_transcripts', transcriptFilter);
 
-    const staffRows = isAdmin
-      ? await selectRows('staff_stats', `${guildFilter ? `${guildFilter}&` : ''}select=discord_id,username,avatar_url,guild_id,tickets_claimed_total,tickets_claimed_week,messages_total,messages_week,last_claimed_at&order=tickets_claimed_week.desc,messages_week.desc&limit=100`)
-      : [];
-    const staff = isAdmin ? await refreshStaffNames(staffRows, settings) : [];
+    const [staffRows, staffDirectory] = isAdmin
+      ? await Promise.all([
+        selectRows('staff_stats', 'select=discord_id,username,avatar_url,guild_id,tickets_claimed_total,tickets_claimed_week,messages_total,messages_week,last_claimed_at&order=tickets_claimed_week.desc,messages_week.desc&limit=250'),
+        fetchStaffDirectory(settings)
+      ])
+      : [[], []];
+    const staff = isAdmin ? await refreshStaffNames(mergeStaffRows(staffRows, staffDirectory, settings), settings) : [];
 
     return sendJson(res, 200, {
       profile,
