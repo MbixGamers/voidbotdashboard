@@ -219,6 +219,44 @@ export async function fetchDiscordGuildMember(guildId, discordId) {
   return member;
 }
 
+export async function fetchDiscordGuildMembers(guildId, options = {}) {
+  const token = getDiscordBotToken();
+
+  if (!token) {
+    const error = new Error('Dashboard staff directory is not configured. Add DISCORD_BOT_TOKEN to the dashboard environment.');
+    error.statusCode = 503;
+    throw error;
+  }
+
+  const limit = Math.min(Math.max(Number(options.limit || 1000), 1), 1000);
+  const maxPages = Math.max(Number(options.maxPages || 10), 1);
+  const members = [];
+  let after = '0';
+
+  for (let page = 0; page < maxPages; page += 1) {
+    const params = new URLSearchParams({ limit: String(limit), after });
+    const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members?${params.toString()}`, {
+      headers: { Authorization: `Bot ${token}` }
+    });
+    const pageMembers = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      const error = new Error(pageMembers?.message || 'Could not load Discord guild members');
+      error.statusCode = response.status;
+      throw error;
+    }
+
+    if (!Array.isArray(pageMembers) || !pageMembers.length) break;
+    members.push(...pageMembers);
+
+    const lastId = pageMembers[pageMembers.length - 1]?.user?.id;
+    if (!lastId || pageMembers.length < limit) break;
+    after = lastId;
+  }
+
+  return members;
+}
+
 
 export async function fetchDiscordCurrentUserGuildMember(guildId, discordId, discordAccessToken) {
   if (!discordAccessToken) return null;
