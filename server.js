@@ -63,7 +63,7 @@ app.get('/api/status', async (req, res) => {
   const uptimeSeconds = process.uptime();
 
   const info = {
-    botName: 'Void Bot',
+    botName: 'Bot',
     online: client?.isReady?.() || false,
     guildCount: client?.guilds?.cache?.size || 0,
     uptime: formatUptime(uptimeSeconds),

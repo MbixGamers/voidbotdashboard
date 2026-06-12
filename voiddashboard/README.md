@@ -1,4 +1,4 @@
-# Void Dashboard
+# Bot Dashboard
 
 This folder is the Vercel-hosted dashboard only. The Discord bot can stay on Katabump and push data into this app through `/api/bot/sync`.
 
@@ -39,7 +39,7 @@ The secret shared in chat should be rotated before production because it has bee
 Create a Vercel project using this folder as the project root:
 
 ```text
-voiddashboard
+botdashboard
 ```
 
 Use these build settings:
@@ -84,7 +84,7 @@ When staff claim tickets, send messages, or close tickets, the bot now sends eve
 ## Local development
 
 ```bash
-cd voiddashboard
+cd botdashboard
 npm install
 cp .env.example .env.local
 npm run dev

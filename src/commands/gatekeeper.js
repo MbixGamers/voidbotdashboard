@@ -59,21 +59,21 @@ async function handleMessage(message) {
   const content = message.content.toLowerCase();
 
   const patterns = [
-    /how (do|can|to) (i )?join void/i,
-    /can i join void/i,
+    /how (do|can|to) (i )?join the team/i,
+    /can i join the team/i,
     /how to become a (member|pro)/i,
-    /void (invite|application|recruitment|tryout)/i,
-    /(join|apply)\s+(void|the team)/i,
-    /\bjoin\b.*\bvoid\b/i,
-    /\bapply\b.*\bvoid\b/i,
-    /want to (join|be part of) void/i,
+    /team (invite|application|recruitment|tryout)/i,
+    /(join|apply)\s+the team/i,
+    /\bjoin\b.*\bteam\b/i,
+    /\bapply\b.*\bteam\b/i,
+    /want to (join|be part of) the team/i,
     /interested in (joining|applying)/i
   ];
 
   if (!patterns.some(p => p.test(content))) return;
 
-  const replyText = `Hello! Welcome to Void eSports!! 👋\n` +
-    `To join Void, please check out <#${INFO_CHANNEL_ID}> for all the info you need.\n` +
+  const replyText = `Hello! Welcome!! 👋\n` +
+    `To join the team, please check out <#${INFO_CHANNEL_ID}> for all the info you need.\n` +
     `Once you've decided, you can apply in <#${APPLY_CHANNEL_ID}>.\n\n` +
     `Good luck! 🚀`;
 

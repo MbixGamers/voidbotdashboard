@@ -971,7 +971,7 @@ module.exports = {
           .setColor(0x5865F2)
           .setTitle('Official Support')
           .setDescription(state.mainContent || 'Welcome to our support system! Please select a ticket type below.')
-          .setFooter({ text: 'Void Esports Ticket System' });
+          .setFooter({ text: 'Esports Ticket System' });
         if (state.logoUrl) embed.setThumbnail(state.logoUrl);
         if (state.bannerUrl) embed.setImage(state.bannerUrl);
 

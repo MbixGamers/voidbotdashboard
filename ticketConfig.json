@@ -49,7 +49,7 @@
         "openingMessage": null
       },
       {
-        "name": "Void Staff",
+        "name": "Staff",
         "categoryId": "1484054714202198077",
         "questions": [],
         "claimEnabled": false,
@@ -65,9 +65,9 @@
         "openingMessage": null
       }
     ],
-    "mainContent": "# Official Void Support\n\n**Before opening a ticket, please make sure you have taken a look at our ⁠rules and ⁠requirements.**\n\nIf none of the resources above helped you, proceed to create a ticket by selecting the most appropriate category in the dropdown menu below.\n\n# ❗️ Please note that:\n\n• Tickets will be checked within a hour.\n\n•Response times are longer on weekdays.\n\n•We close any ticket with inactivity of a day or more.\n\n•We close any ticket created in the wrong category.\n\n***Powered By Void eSports***",
-    "logoUrl": "https://media.discordapp.net/attachments/1459407893362380932/1459408107342921800/VoidSimpleLogo.png?ex=69bb7fb7&is=69ba2e37&hm=f6b9ba4af870c17750c0fefc37d5742917b9d0fd17a8947eeb0b2b4e0d3819b4&=&format=webp&quality=lossless&width=748&height=748",
-    "bannerUrl": "https://media.discordapp.net/attachments/1459407893362380932/1459408107066363934/VoidBanner.png?ex=69bb7fb7&is=69ba2e37&hm=242672ba88a43a3ab1bcf0020fe617c72d884598a7abfe34faf975c45159468c&=&format=webp&quality=lossless&width=1751&height=583"
+    "mainContent": "# Official Support\n\n**Before opening a ticket, please make sure you have taken a look at our ⁠rules and ⁠requirements.**\n\nIf none of the resources above helped you, proceed to create a ticket by selecting the most appropriate category in the dropdown menu below.\n\n# ❗️ Please note that:\n\n• Tickets will be checked within a hour.\n\n•Response times are longer on weekdays.\n\n•We close any ticket with inactivity of a day or more.\n\n•We close any ticket created in the wrong category.\n\n***Powered By eSports***",
+    "logoUrl": null,
+    "bannerUrl": null
   },
   "1351362266246680626": {
     "panelChannelId": "1444529135891386520",
@@ -138,7 +138,7 @@
             "type": "text"
           },
           {
-            "label": "Use \"team.void\" in fortnite item shop and send a ScreenShot",
+            "label": "Send a screenshot from the Fortnite item shop",
             "placeholder": "",
             "type": "file"
           }
@@ -154,7 +154,7 @@
         "categoryId": "1484047826467033249",
         "questions": [
           {
-            "label": "What do you want to join void as?",
+            "label": "What role do you want to join as?",
             "placeholder": "content creator, streamer etc...",
             "type": "text"
           },
@@ -171,7 +171,7 @@
         "openingMessage": null
       },
       {
-        "name": "🛠️ Void Staff",
+        "name": "🛠️ Staff",
         "categoryId": "1444542784647331983",
         "questions": [
           {
@@ -214,9 +214,9 @@
         "openingMessage": null
       }
     ],
-    "mainContent": "# Void eSports™\n\n**Before opening a ticket, please make sure you have taken a look at our ⁠rules and ⁠requirements.**\n\n*If none of the resources above helped you, proceed to create a ticket by selecting the most appropriate category in the drop-down menu below.*\n\n# ❗️ Please note that:\n\n• Tickets will be checked within a hour.\n\n•Response times are longer on weekdays.\n\n•We close any ticket with inactivity of a day or more.\n\n•We close any ticket created in the wrong category.\n\n***Powered By Void eSports™***",
-    "logoUrl": "https://media.discordapp.net/attachments/1459407893362380932/1459408107342921800/VoidSimpleLogo.png?ex=69bb7fb7&is=69ba2e37&hm=f6b9ba4af870c17750c0fefc37d5742917b9d0fd17a8947eeb0b2b4e0d3819b4&=&format=webp&quality=lossless&width=748&height=748",
-    "bannerUrl": "https://media.discordapp.net/attachments/1459407893362380932/1459408107066363934/VoidBanner.png?ex=69bb7fb7&is=69ba2e37&hm=242672ba88a43a3ab1bcf0020fe617c72d884598a7abfe34faf975c45159468c&=&format=webp&quality=lossless&width=1751&height=583"
+    "mainContent": "# eSports™\n\n**Before opening a ticket, please make sure you have taken a look at our ⁠rules and ⁠requirements.**\n\n*If none of the resources above helped you, proceed to create a ticket by selecting the most appropriate category in the drop-down menu below.*\n\n# ❗️ Please note that:\n\n• Tickets will be checked within a hour.\n\n•Response times are longer on weekdays.\n\n•We close any ticket with inactivity of a day or more.\n\n•We close any ticket created in the wrong category.\n\n***Powered By eSports™***",
+    "logoUrl": null,
+    "bannerUrl": null
   },
   "1456372317629186194": {
     "panelChannelId": "1483355350861086810",
@@ -378,9 +378,9 @@
         "openingMessage": null
       }
     ],
-    "mainContent": "# Void eSports™\n\n**Main Goal is to help each one of you get coaching and help you get better at the game**\n\n**Before opening a ticket, please make sure you have taken a look at our ⁠rules and ⁠requirements.**\n\n*If none of the resources above helped you, proceed to create a ticket by selecting the most appropriate category in the drop-down menu below.*\n\n# ❗️ Please note that:\n\n• Tickets will be checked asap when coaches are available.\n\n•Response times are longer on weekdays.\n\n•We close any ticket with inactivity of a day or more.\n\n•We close any ticket created in the wrong category.\n\n***Powered By Void eSports™***",
+    "mainContent": "# eSports™\n\n**Main Goal is to help each one of you get coaching and help you get better at the game**\n\n**Before opening a ticket, please make sure you have taken a look at our ⁠rules and ⁠requirements.**\n\n*If none of the resources above helped you, proceed to create a ticket by selecting the most appropriate category in the drop-down menu below.*\n\n# ❗️ Please note that:\n\n• Tickets will be checked asap when coaches are available.\n\n•Response times are longer on weekdays.\n\n•We close any ticket with inactivity of a day or more.\n\n•We close any ticket created in the wrong category.\n\n***Powered By eSports™***",
     "logoUrl": "https://drive.google.com/u/0/drive-viewer/AKGpihZ2xusy7UzDzxgLoL7mByMZ5Vbfkp8z6fS-dZ_bL9tOSVtzmwntXeofqVf_P0YaT0Q8BvTyn43zapKignwxgdCMPfSRjnSFyeQ=s2560?auditContext=forDisplay",
-    "bannerUrl": "https://media.discordapp.net/attachments/1459407893362380932/1459408107066363934/VoidBanner.png?ex=69bcd137&is=69bb7fb7&hm=91571183f3d3b2a0eff941c062b1e866e78fc1bb2bfd05b85bddf581f0e9f223&=&format=webp&quality=lossless&width=1751&height=583"
+    "bannerUrl": null
   },
   "1506716252436172941": {
     "panelChannelId": "1506716253354590362",
@@ -431,8 +431,8 @@
         "openingMessage": null
       }
     ],
-    "mainContent": "Official Void Support\nBefore opening a ticket, please make sure you have taken a look at our ⁠rules and ⁠requirements.\n\nIf none of the resources above helped you, proceed to create a ticket by selecting the most appropriate category in the dropdown menu below.\n\n❗️ Please note that:\n• Tickets will be checked within a hour.\n\n•Response times are longer on weekdays.\n\n•We close any ticket with inactivity of a day or more.\n\n•We close any ticket created in the wrong category.",
-    "logoUrl": "https://cdn.discordapp.com/attachments/1506716253354590362/1507372435727712459/VoidSimpleLogo.png?ex=6a11a97a&is=6a1057fa&hm=9f42b3365998cb2194590f0f998f48343bc6e3339692371221e780f4943d9c3f&",
-    "bannerUrl": "https://cdn.discordapp.com/attachments/1506716253354590362/1507372435249299476/VoidBanner.png?ex=6a11a97a&is=6a1057fa&hm=2f7497030fb9424d7a1b945029310dfe6e7e47cc5fb8185737a1fed27e2bc3cc&"
+    "mainContent": "Official Support\nBefore opening a ticket, please make sure you have taken a look at our ⁠rules and ⁠requirements.\n\nIf none of the resources above helped you, proceed to create a ticket by selecting the most appropriate category in the dropdown menu below.\n\n❗️ Please note that:\n• Tickets will be checked within a hour.\n\n•Response times are longer on weekdays.\n\n•We close any ticket with inactivity of a day or more.\n\n•We close any ticket created in the wrong category.",
+    "logoUrl": null,
+    "bannerUrl": null
   }
 }

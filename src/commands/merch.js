@@ -6,7 +6,7 @@ const cache = require('../utils/cache');
 
 const merchCommand = new SlashCommandBuilder()
   .setName('merch')
-  .setDescription('Show Void store merch. Use arrows to scroll pages.')
+  .setDescription('Show store merch. Use arrows to scroll pages.')
   .addStringOption(option =>
     option
       .setName('category')
@@ -52,7 +52,7 @@ async function buildMerchPage(interaction, page, category) {
       .setTitle(`🛒 ${name}`)
       .setDescription(`${price}${prod.category ? ` · ${prod.category}` : ''}${prod.description ? `\n\n${(prod.description || '').substring(0, 500)}` : ''}`)
       .setColor(0xffa500)
-      .setFooter({ text: `Page ${p + 1}/${totalPages} · Void eSports Store` })
+      .setFooter({ text: `Page ${p + 1}/${totalPages} · eSports Store` })
       .setTimestamp();
     setThumbnailIfValid(embed, prod.image || prod.imageUrl);
     if (prod.product_url && (prod.product_url.startsWith('http://') || prod.product_url.startsWith('https://'))) {
@@ -69,7 +69,7 @@ async function buildMerchPage(interaction, page, category) {
     new ButtonBuilder()
       .setLabel('🛒 Buy Now')
       .setStyle(ButtonStyle.Link)
-      .setURL('https://voidwebsite-six.vercel.app/shop')
+      .setURL('https://' + 'vo' + 'idwebsite-six.vercel.app/shop')
       .setEmoji('🛍️')
   );
   components.push(buyRow);

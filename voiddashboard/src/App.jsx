@@ -4,7 +4,7 @@ import { isSupabaseConfigured, supabase } from './supabaseClient';
 const fallbackDashboard = {
   profile: {
     discord_id: '000000000000000000',
-    username: 'Void Staff',
+    username: 'Staff',
     avatar_url: null
   },
   isAdmin: true,
@@ -49,7 +49,7 @@ const fallbackDashboard = {
 
 function getAvatarUrl(profile) {
   if (profile?.avatar_url) return profile.avatar_url;
-  return `https://api.dicebear.com/9.x/shapes/svg?seed=${encodeURIComponent(profile?.discord_id || 'void')}`;
+  return `https://api.dicebear.com/9.x/shapes/svg?seed=${encodeURIComponent(profile?.discord_id || 'bot')}`;
 }
 
 function formatNumber(value) {
@@ -288,7 +288,7 @@ function App() {
   }
 
   // Only show auth error if there's a session AND an auth error message
-  const isAuthError = session && /invalid staff authorization|not a staff member|required authority|not a Void staff/i.test(notice);
+  const isAuthError = session && /invalid staff authorization|not a staff member|required authority|not a staff/i.test(notice);
   const showLogin = isSupabaseConfigured && !session;
   const showDashboard = !showLogin && !isAuthError;
 
@@ -296,9 +296,9 @@ function App() {
     <div className="app-shell">
       <nav className="topbar">
         <div className="brand">
-          <span className="brand-mark">V</span>
+          <span className="brand-mark">B</span>
           <div>
-            <p className="brand-title">Void Dashboard</p>
+            <p className="brand-title">Bot Dashboard</p>
             <p className="brand-subtitle">Discord staff performance hub</p>
           </div>
         </div>
@@ -318,7 +318,7 @@ function App() {
 
       <header className="hero-card">
         <div className="hero-copy">
-          <p className="eyebrow">Void staff operations</p>
+          <p className="eyebrow">Staff operations</p>
           <h1>A clean command center for ticket support performance.</h1>
           <p>
             Track claims, ticket replies, weekly mod-check goals, and closed-ticket transcripts from one polished dashboard.
@@ -334,7 +334,7 @@ function App() {
           <img src={getAvatarUrl(profile)} alt="Discord avatar" />
           <div>
             <p>{session ? 'Signed in as' : 'Previewing as'}</p>
-            <h2>{profile.username || 'Void Staff'}</h2>
+            <h2>{profile.username || 'Staff'}</h2>
             <span className={dashboard.isAdmin ? 'role-pill admin' : 'role-pill'}>{dashboard.isAdmin ? 'Admin panel enabled' : 'Staff dashboard'}</span>
           </div>
         </aside>
@@ -343,7 +343,7 @@ function App() {
       {showLogin ? (
         <section className="login-card">
           <h2>Login required</h2>
-          <p>Use Discord OAuth through Supabase to view your personal Void server dashboard.</p>
+          <p>Use Discord OAuth through Supabase to view your personal server dashboard.</p>
           <button className="button button-primary" onClick={signInWithDiscord}>Continue with Discord</button>
         </section>
       ) : null}

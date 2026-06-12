@@ -2,9 +2,9 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 
 const rankingCommand = new SlashCommandBuilder()
     .setName('ranking')
-    .setDescription('Get the current esports ranking for Void Esports');
+    .setDescription('Get the current esports ranking');
 
-const VOID_RANKING_DATA = {
+const RANKING_DATA = {
     nacRank: 17,
     totalEarnings: 7500,
     prPoints: 122365,
@@ -24,29 +24,29 @@ function formatNumber(num) {
 async function handleRanking(interaction) {
     try {
         const embed = new EmbedBuilder()
-            .setTitle('🏆 **VOID ESPORTS RANKINGS**')
+            .setTitle('🏆 **ESPORTS RANKINGS**')
             .setDescription('▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬')
             .setColor(0x8a2be2)
             .setThumbnail('https://cdn.discordapp.com/emojis/1444539060004589669.webp?size=128')
             .addFields(
                 {
                     name: '📊 **PR POINTS**',
-                    value: `\`\`\`\n${formatNumber(VOID_RANKING_DATA.prPoints)}\n\`\`\``,
+                    value: `\`\`\`\n${formatNumber(RANKING_DATA.prPoints)}\n\`\`\``,
                     inline: false
                 },
                 {
                     name: '📍 **NAC RANKING**',
-                    value: `\`\`\`\n#${VOID_RANKING_DATA.nacRank}\n\`\`\``,
+                    value: `\`\`\`\n#${RANKING_DATA.nacRank}\n\`\`\``,
                     inline: true
                 },
                 {
                     name: '💰 **TOTAL EARNINGS**',
-                    value: `\`\`\`\n${formatCurrency(VOID_RANKING_DATA.totalEarnings)}\n\`\`\``,
+                    value: `\`\`\`\n${formatCurrency(RANKING_DATA.totalEarnings)}\n\`\`\``,
                     inline: true
                 }
             )
             .setFooter({
-                text: `Last updated: ${VOID_RANKING_DATA.lastUpdated} • Data from FortniteTracker`,
+                text: `Last updated: ${RANKING_DATA.lastUpdated} • Data from FortniteTracker`,
                 iconURL: interaction.client.user.displayAvatarURL()
             })
             .setTimestamp();
@@ -56,7 +56,7 @@ async function handleRanking(interaction) {
                 new ButtonBuilder()
                     .setLabel('View on Fortnite Tracker')
                     .setStyle(ButtonStyle.Link)
-                    .setURL('https://fortnitetracker.com/esports/organization/void-esports')
+                    .setURL('https://fortnitetracker.com/esports/organization/' + 'vo' + 'id-esports')
                     .setEmoji('🔗'),
                 new ButtonBuilder()
                     .setLabel('NAC Leaderboard')

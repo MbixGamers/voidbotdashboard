@@ -6,7 +6,7 @@ const cache = require('../utils/cache');
 
 const newsCommand = new SlashCommandBuilder()
   .setName('news')
-  .setDescription('Show latest Void news. Use arrows to scroll pages.')
+  .setDescription('Show latest news. Use arrows to scroll pages.')
   .addIntegerOption(option =>
     option
       .setName('limit')
@@ -47,7 +47,7 @@ async function buildNewsPage(interaction, page, limit = 15) {
       .setDescription((a.description || 'No summary.').substring(0, 4096))
       .setColor(0x00ff7f)
       .setTimestamp(a.date ? new Date(a.date) : undefined)
-      .setFooter({ text: 'Void eSports News · Live from website' });
+      .setFooter({ text: 'eSports News · Live from website' });
     const videoUrl = a.youtubeUrl || a.videoUrl || a.videoLink || a.link || a.url;
     if (videoUrl && (videoUrl.includes('youtube') || videoUrl.includes('youtu.be') || videoUrl.startsWith('http'))) {
       embed.addFields({ name: '▶ Watch', value: `[YouTube / Video](${videoUrl})`, inline: false });

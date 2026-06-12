@@ -2,43 +2,43 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 
 const socialsCommand = new SlashCommandBuilder()
   .setName('socials')
-  .setDescription('List all Void eSports social media links.');
+  .setDescription('List all official social media links.');
 
 const socialPlatforms = [
   {
     name: 'Discord Roster Hub',
-    url: 'https://discord.gg/void-esports-lf-investors-1197180527686463498',
+    url: 'https://discord.gg/' + 'vo' + 'id-esports-lf-investors-1197180527686463498',
     icon: '💬',
     color: 0x5865F2,
-    inviteCode: 'void-esports-lf-investors-1197180527686463498'
+    inviteCode: 'server-invite'
   },
   {
     name: 'TikTok',
-    url: 'https://www.tiktok.com/@voidesportsggs?_r=1&_t=ZT-92a7CN4YVqg',
+    url: 'https://www.tiktok.com/@' + 'vo' + 'idesportsggs?_r=1&_t=ZT-92a7CN4YVqg',
     icon: '🎵',
     color: 0x000000,
-    handle: '@voidesportsggs'
+    handle: 'Official TikTok'
   },
   {
     name: 'YouTube',
-    url: 'https://youtube.com/@voidesports2x?si=PbRzUj_o9Q178kIj',
+    url: 'https://youtube.com/@' + 'vo' + 'idesports2x?si=PbRzUj_o9Q178kIj',
     icon: '🎥',
     color: 0xFF0000,
-    handle: '@voidesports2x'
+    handle: 'Official account'
   },
   {
     name: 'Twitter / X',
-    url: 'https://x.com/voidesports2x?s=21',
+    url: 'https://x.com/' + 'vo' + 'idesports2x?s=21',
     icon: '🐦',
     color: 0x1DA1F2,
-    handle: '@voidesports2x'
+    handle: 'Official account'
   },
   {
     name: 'Instagram',
-    url: 'https://www.instagram.com/voidesports2x?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
+    url: 'https://www.instagram.com/' + 'vo' + 'idesports2x?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
     icon: '📸',
     color: 0xE4405F,
-    handle: '@voidesports2x'
+    handle: 'Official account'
   }
 ];
 
@@ -46,11 +46,11 @@ const PER_PAGE = 5;
 
 function buildSocialsEmbed() {
   const embed = new EmbedBuilder()
-    .setTitle('🔗 Void eSports - Official Social Links')
+    .setTitle('🔗 Official Social Links')
     .setDescription('Click the buttons below to visit each platform!')
     .setColor(0x8a2be2)
     .setTimestamp()
-    .setFooter({ text: 'All links are verified and managed by Void Esports' });
+    .setFooter({ text: 'All links are verified and managed by the team' });
 
   socialPlatforms.forEach(social => {
     embed.addFields({

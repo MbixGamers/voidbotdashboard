@@ -38,7 +38,7 @@ async function handleUptime(interaction) {
     )
     .setColor(0x00ff00)
     .setTimestamp()
-    .setFooter({ text: 'Void Website Bot' });
+    .setFooter({ text: 'Bot' });
 
   await interaction.editReply({ embeds: [embed] });
 }
