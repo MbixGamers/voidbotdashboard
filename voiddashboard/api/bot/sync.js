@@ -1,4 +1,4 @@
-import { handleApiError, insertRows, selectRows, sendJson, upsertProfile, upsertRows } from '../_supabase.js';
+import { getDashboardSettings, handleApiError, insertRows, selectRows, sendJson, upsertProfile, upsertRows } from '../_supabase.js';
 
 function requireBotKey(req) {
   const expected = process.env.DASHBOARD_BOT_API_KEY;
@@ -123,13 +123,26 @@ function getRequestBody(req) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
+  if (!['GET', 'POST'].includes(req.method)) {
+    res.setHeader('Allow', 'GET, POST');
     return sendJson(res, 405, { error: 'Method not allowed' });
   }
 
   try {
     requireBotKey(req);
+
+    if (req.method === 'GET') {
+      const settings = await getDashboardSettings();
+      return sendJson(res, 200, {
+        ok: true,
+        settings: {
+          auth_guild_id: settings.auth_guild_id,
+          auth_role_id: settings.auth_role_id,
+          auth_role_ids: settings.auth_role_ids || [],
+          tracked_role_ids: settings.auth_role_ids || []
+        }
+      });
+    }
     const body = getRequestBody(req);
     const event = body?.event;
     const payload = body?.payload || {};

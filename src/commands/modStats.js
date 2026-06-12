@@ -162,8 +162,17 @@ function getConfiguredTicketCategoryIds() {
   return categoryIds;
 }
 
+function getDashboardTrackedRoleIds() {
+  const settings = dashboardSync.getCachedDashboardSettings?.();
+  return Array.isArray(settings?.tracked_role_ids) ? settings.tracked_role_ids : [];
+}
+
+function getTrackedRoleIds() {
+  return Array.from(new Set([...config.trackedRoles, ...getDashboardTrackedRoleIds()].filter(Boolean)));
+}
+
 function getConfiguredStaffRoleIds() {
-  const roleIds = new Set([...config.trackedRoles, ...EXCEPTION_ROLES]);
+  const roleIds = new Set([...getTrackedRoleIds(), ...EXCEPTION_ROLES]);
   if (config.adminRoleId) roleIds.add(config.adminRoleId);
   if (config.dashboardStaffRoleId) roleIds.add(config.dashboardStaffRoleId);
 
@@ -212,7 +221,7 @@ async function getRelevantMembers(guild, includeExceptions = true) {
   }
 
   const members = [];
-  const roles = includeExceptions ? [...getConfiguredStaffRoleIds()] : config.trackedRoles;
+  const roles = includeExceptions ? [...getConfiguredStaffRoleIds()] : getTrackedRoleIds();
   for (const roleId of roles) {
     const role = guild.roles.cache.get(roleId);
     if (!role) continue;
@@ -419,7 +428,8 @@ async function handleModcheck(interaction, page = 0) {
       const memberObj = guild.members.cache.get(userId);
       if (!memberObj) continue;
 
-      const trackedRoles = memberObj.roles.cache.filter(r => config.trackedRoles.includes(r.id));
+      const trackedRoleIds = getTrackedRoleIds();
+      const trackedRoles = memberObj.roles.cache.filter(r => trackedRoleIds.includes(r.id));
       let highestRole = null;
       let highestPosition = -1;
       trackedRoles.forEach(role => {
@@ -568,7 +578,8 @@ async function handleModget(interaction) {
     const guild = interaction.guild;
     const member = guild.members.cache.get(targetUser.id);
 
-    const hasTrackedRole = member && member.roles.cache.some(r => config.trackedRoles.includes(r.id));
+    const trackedRoleIds = getTrackedRoleIds();
+    const hasTrackedRole = member && member.roles.cache.some(r => trackedRoleIds.includes(r.id));
 
     if (!hasTrackedRole) {
       return interaction.editReply({
@@ -581,7 +592,7 @@ async function handleModget(interaction) {
     const tickets = ticketCounts[userId] || 0;
     const messages = messageCounts[userId] || 0;
 
-    const trackedRoles = member.roles.cache.filter(r => config.trackedRoles.includes(r.id));
+    const trackedRoles = member.roles.cache.filter(r => trackedRoleIds.includes(r.id));
     let highestRole = null;
     let highestPosition = -1;
     trackedRoles.forEach(role => {
@@ -639,7 +650,7 @@ async function handleModinfo(interaction) {
     const guild = interaction.guild;
     const roles = [];
 
-    for (const roleId of config.trackedRoles) {
+    for (const roleId of getTrackedRoleIds()) {
       const role = guild.roles.cache.get(roleId);
       if (role) {
         roles.push({ id: role.id, name: role.name });
@@ -972,13 +983,14 @@ async function handleTicketscanPage(interaction, page) {
 
 // ==================== EVENT HANDLERS ====================
 function initModStats(client) {
-  if (!config.trackedRoles.length) {
-    console.warn('⚠️ No TRACKED_ROLES set; mod stats will still count admins, dashboard staff, exception roles, and ticket ping roles.');
+  if (!getTrackedRoleIds().length) {
+    console.warn('⚠️ No tracked staff roles configured; mod stats will still count admins, dashboard staff, exception roles, and ticket ping roles.');
   }
 
   // Load all data first
   Promise.all([
     ticketConfig.ensureLoaded(),
+    dashboardSync.fetchDashboardSettings({ force: true }),
     loadStats(),
     loadProcessedMessages(),
     loadRepliesCache()
@@ -1001,6 +1013,17 @@ function initModStats(client) {
     if (writePending) saveStatsNow();
     if (repliesWritePending) saveRepliesCache();
   }, WRITE_DEBOUNCE_MS * 2);
+
+  setInterval(() => {
+    dashboardSync.fetchDashboardSettings({ force: true })
+      .then(() => {
+        memberCache = { timestamp: 0, members: [] };
+        trackedOnlyCache = { timestamp: 0, members: [] };
+      })
+      .catch(err => {
+        console.warn('⚠️ Could not refresh dashboard staff role settings:', err.message);
+      });
+  }, Number(process.env.DASHBOARD_SETTINGS_REFRESH_MS || 5 * 60 * 1000));
 
   client.on('messageCreate', async (message) => {
     // Ignore bot messages
@@ -1080,5 +1103,6 @@ module.exports = {
   isStaff,
   isTicketChannel,
   getConfiguredTicketCategoryIds,
-  getConfiguredStaffRoleIds
+  getConfiguredStaffRoleIds,
+  getTrackedRoleIds
 };
