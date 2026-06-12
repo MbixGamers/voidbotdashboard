@@ -72,8 +72,8 @@ alter table public.ticket_transcripts enable row level security;
 
 create table if not exists public.dashboard_settings (
   id text primary key default 'global' check (id = 'global'),
-  auth_guild_id text not null default '1351362266246680626',
-  auth_role_id text not null default '1444524137526853723',
+  auth_guild_id text not null default '1454879351605690522',
+  auth_role_id text not null default '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560',
   updated_by text,
   admin_discord_ids text[] not null default '{}',
   created_at timestamptz not null default now(),
@@ -81,8 +81,13 @@ create table if not exists public.dashboard_settings (
 );
 
 insert into public.dashboard_settings (id, auth_guild_id, auth_role_id)
-values ('global', '1351362266246680626', '1444524137526853723')
-on conflict (id) do nothing;
+values ('global', '1454879351605690522', '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560')
+on conflict (id) do update
+set auth_guild_id = excluded.auth_guild_id,
+    auth_role_id = excluded.auth_role_id,
+    updated_at = now()
+where public.dashboard_settings.auth_guild_id = '1351362266246680626'
+  and public.dashboard_settings.auth_role_id = '1444524137526853723';
 
 alter table public.dashboard_settings
   add column if not exists admin_discord_ids text[] not null default '{}';

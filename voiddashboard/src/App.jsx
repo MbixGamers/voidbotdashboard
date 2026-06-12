@@ -27,8 +27,8 @@ const fallbackDashboard = {
     { discord_id: '1003', username: 'Echo', tickets_claimed_week: 18, messages_week: 96 }
   ],
   settings: {
-    auth_guild_id: '1351362266246680626',
-    auth_role_id: '1444524137526853723',
+    auth_guild_id: '1454879351605690522',
+    auth_role_id: '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560',
     admin_discord_ids: []
   },
   transcripts: [
@@ -115,7 +115,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
-  const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100, auth_guild_id: '1351362266246680626', auth_role_id: '1444524137526853723', admin_discord_ids: '' });
+  const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100, auth_guild_id: '1454879351605690522', auth_role_id: '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560', admin_discord_ids: '' });
   const [refreshingStaff, setRefreshingStaff] = useState(false);
 
   const loadDashboard = useCallback(async (activeSession) => {
@@ -139,8 +139,8 @@ function App() {
       setModForm({
         weekly_ticket_goal: data.modCheck?.weekly_ticket_goal || 0,
         message_goal: data.modCheck?.message_goal || 0,
-        auth_guild_id: data.settings?.auth_guild_id || '1351362266246680626',
-        auth_role_id: data.settings?.auth_role_id || '1444524137526853723',
+        auth_guild_id: data.settings?.auth_guild_id || '1454879351605690522',
+        auth_role_id: data.settings?.auth_role_id || '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560',
         admin_discord_ids: (data.settings?.admin_discord_ids || []).join('\n')
       });
     } catch (error) {
@@ -438,7 +438,7 @@ function App() {
                     />
                   </label>
                   <label>
-                    Required role ID(s)
+                    Tracked staff role ID(s)
                     <input
                       value={modForm.auth_role_id}
                       onChange={(event) => setModForm((current) => ({ ...current, auth_role_id: event.target.value.trim() }))}
@@ -454,7 +454,7 @@ function App() {
                     />
                   </label>
                 </div>
-                <p className="muted">Use one role ID, or comma-separate multiple staff role IDs. Admin bypass IDs skip the server/role check and receive the same admin dashboard access as the master admin.</p>
+                <p className="muted">Use one role ID, or comma-separate multiple staff role IDs. These roles control dashboard access and the bot's synced staff tracking for ticket claims/messages. Admin bypass IDs skip the server/role check and receive the same admin dashboard access as the master admin.</p>
               </div>
               <button className="button button-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save dashboard settings'}</button>
             </form>
