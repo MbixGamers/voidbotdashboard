@@ -25,8 +25,8 @@ const CUSTOM_EMOJI_URL = 'https://cdn.discordapp.com/emojis/1444539060004589669.
 
 function buildHelpEmbed(category, totalCommands = 35) {
   const embed = new EmbedBuilder()
-    .setTitle('🤖 Void Website Bot - Commands')
-    .setDescription('All data is **live** from the Void website (Firebase). Use the buttons below to navigate.')
+    .setTitle('🤖 Bot - Commands')
+    .setDescription('All data is **live** from the website (Firebase). Use the buttons below to navigate.')
     .setColor(0x8a2be2)
     .setTimestamp()
     .setFooter({ 
@@ -43,7 +43,7 @@ function buildHelpEmbed(category, totalCommands = 35) {
     );
   } else if (category === 'content') {
     embed.addFields(
-      { name: '🛒 **Merch**', value: '`/merch` - Browse Void store merchandise', inline: true },
+      { name: '🛒 **Merch**', value: '`/merch` - Browse store merchandise', inline: true },
       { name: '📰 **News**', value: '`/news` - Latest news articles', inline: true },
       { name: '🎥 **Videos**', value: '`/videos` - Latest YouTube videos\n`/latest-video` - Most recent video', inline: true }
     );
@@ -51,7 +51,7 @@ function buildHelpEmbed(category, totalCommands = 35) {
     embed.addFields(
       { name: '📊 **Stats**', value: '`/uptime` - Bot uptime & latency', inline: true },
       { name: '❓ **Help**', value: '`/help` - This command', inline: true },
-      { name: '🎲 **Fun Fact**', value: '`/funfact` - Random Void fact', inline: true },
+      { name: '🎲 **Fun Fact**', value: '`/funfact` - Random fact', inline: true },
       { name: '🏆 **Ranking**', value: '`/ranking` - Current esports ranking', inline: true },
       { name: '🎂 **Birthday**', value: '`/bwish` - Wish someone happy birthday', inline: true }
     );
@@ -76,12 +76,12 @@ function buildHelpEmbed(category, totalCommands = 35) {
     );
   } else if (category === 'socials') {
     embed.addFields(
-      { name: '🔗 **Social Links**', value: '`/socials` - All Void social media platforms', inline: false },
+      { name: '🔗 **Social Links**', value: '`/socials` - All social media platforms', inline: false },
       { name: '💬 **Discord**', value: 'Join our community!', inline: true },
-      { name: '🎵 **TikTok**', value: '@voidesportsggs', inline: true },
-      { name: '🎥 **YouTube**', value: '@voidesports2x', inline: true },
-      { name: '🐦 **Twitter/X**', value: '@voidesports2x', inline: true },
-      { name: '📸 **Instagram**', value: '@voidesports2x', inline: true }
+      { name: '🎵 **TikTok**', value: 'Official TikTok', inline: true },
+      { name: '🎥 **YouTube**', value: 'Official account', inline: true },
+      { name: '🐦 **Twitter/X**', value: 'Official account', inline: true },
+      { name: '📸 **Instagram**', value: 'Official account', inline: true }
     );
   } else if (category === 'security') {
     embed.addFields(

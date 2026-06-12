@@ -6,7 +6,7 @@ const cache = require('../utils/cache');
 
 const videosCommand = new SlashCommandBuilder()
   .setName('videos')
-  .setDescription('Show latest Void YouTube videos (same as on the website).')
+  .setDescription('Show latest YouTube videos (same as on the website).')
   .addIntegerOption(option =>
     option
       .setName('limit')
@@ -201,7 +201,7 @@ function buildVideoEmbed(video, index, total) {
     .setDescription(video.description ? video.description.substring(0, 4096) : 'No description available.')
     .setColor(0xff0000)
     .setAuthor({ 
-      name: video.channelTitle || 'Void Esports', 
+      name: video.channelTitle || 'Esports',
       iconURL: 'https://www.youtube.com/s/desktop/014d6b3c/img/favicon_144x144.png' 
     })
     .setFooter({ 

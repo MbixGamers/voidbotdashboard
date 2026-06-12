@@ -964,7 +964,7 @@ async function loginWithRetry() {
 }
 
 async function start() {
-  console.log('🚀 Starting Void Esports Discord Bot...');
+  console.log('🚀 Starting Esports Discord Bot...');
   if (!discordToken || discordToken.split('.').length !== 3) {
     console.error('❌ DISCORD_TOKEN is missing or malformed.');
     process.exit(1);

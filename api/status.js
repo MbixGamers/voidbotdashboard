@@ -92,7 +92,7 @@ module.exports = async (req, res) => {
 
   res.setHeader('Content-Type', 'application/json');
   res.status(200).json({
-    botName: 'Void Bot',
+    botName: 'Bot',
     guildCount: guildConfig ? Object.keys(guildConfig).length : 0,
     blacklistCount: blacklistEntries.length,
     blacklistedUsers: uniqueUsers.length,

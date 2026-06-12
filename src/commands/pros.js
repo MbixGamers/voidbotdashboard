@@ -12,7 +12,7 @@ const CACHE_KEY_ALL_OPS = 'allOps';
 
 const teamsCommand = new SlashCommandBuilder()
   .setName('teams')
-  .setDescription('Show Void eSports teams, pros, and operations statistics.');
+  .setDescription('Show eSports teams, pros, and operations statistics.');
 
 const prosListCommand = new SlashCommandBuilder()
   .setName('pros_list')
@@ -199,7 +199,7 @@ function buildProEmbed(foundPro, teamName, source) {
     )
     .setColor(0x8a2be2)
     .setTimestamp()
-    .setFooter({ text: 'Live from Void Website' });
+    .setFooter({ text: 'Live from Website' });
 
   if (foundPro.achievements && Array.isArray(foundPro.achievements) && foundPro.achievements.length) {
     embed.addFields({
@@ -275,15 +275,15 @@ async function handleTeams(interaction) {
     }
 
     const embed = new EmbedBuilder()
-      .setTitle('📊 Void eSports — Team Statistics')
-      .setDescription('Live counts from the Void website')
+      .setTitle('📊 eSports — Team Statistics')
+      .setDescription('Live counts from the website')
       .addFields(
         { name: '📈 Overview', value: `Total Teams: ${teams.length}\nTotal Pros: ${totalPros}\nTotal Operations: ${totalOps}`, inline: false },
         { name: '📋 Team Breakdown', value: breakdownText || 'No teams with players found', inline: false }
       )
       .setColor(0x8a2be2)
       .setTimestamp()
-      .setFooter({ text: 'Live from Void Website · /pros_list to see all pros' });
+      .setFooter({ text: 'Live from Website · /pros_list to see all pros' });
 
     await interaction.editReply({ content: null, embeds: [embed] });
   } catch (error) {

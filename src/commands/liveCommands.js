@@ -97,7 +97,7 @@ async function handleLatest(interaction) {
       .setDescription((a.description || 'No summary.').substring(0, 4096))
       .setColor(0x00ff7f)
       .setTimestamp(a.date ? new Date(a.date) : undefined)
-      .setFooter({ text: 'Latest from Void eSports News' });
+      .setFooter({ text: 'Latest from eSports News' });
     setThumbnailIfValid(embed, a.image);
     await interaction.editReply({ embeds: [embed] });
   } catch (error) {
@@ -124,7 +124,7 @@ async function handleRandomPro(interaction) {
       )
       .setColor(0x8a2be2)
       .setTimestamp()
-      .setFooter({ text: 'Live from Void website' });
+      .setFooter({ text: 'Live from website' });
     if (pro.achievements && pro.achievements.length) {
       embed.addFields({ name: 'Achievements', value: pro.achievements.slice(0, 5).join('\n') });
     }

@@ -320,7 +320,7 @@
     "closed": false,
     "claimedBy": null,
     "answers": {
-      "Why Void?": "idk"
+      "Why this team?": "idk"
     },
     "pingRoles": [
       "1483724916170952876"
@@ -501,7 +501,7 @@
   "1483887106249195530": {
     "guildId": "1351362266246680626",
     "openerId": "1261741206950383636",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T17:57:35.512Z",
     "closed": true,
     "claimedBy": null,
@@ -511,7 +511,7 @@
   "1483887114121773178": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T17:57:37.514Z",
     "closed": true,
     "claimedBy": null,
@@ -521,7 +521,7 @@
   "1483887121952538768": {
     "guildId": "1351362266246680626",
     "openerId": "1015976575981858826",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T17:57:39.470Z",
     "closed": true,
     "claimedBy": null,
@@ -531,7 +531,7 @@
   "1483888025611145349": {
     "guildId": "1351362266246680626",
     "openerId": "1441708417898250251",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:01:14.665Z",
     "closed": false,
     "claimedBy": null,
@@ -544,7 +544,7 @@
   "1483889184597868686": {
     "guildId": "1351362266246680626",
     "openerId": "1380108789784641630",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:05:50.991Z",
     "closed": true,
     "claimedBy": null,
@@ -559,7 +559,7 @@
   "1483890125497827460": {
     "guildId": "1351362266246680626",
     "openerId": "1261741206950383636",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:09:35.519Z",
     "closed": true,
     "claimedBy": null,
@@ -574,7 +574,7 @@
   "1483890817314586724": {
     "guildId": "1351362266246680626",
     "openerId": "1015976575981858826",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:12:20.407Z",
     "closed": true,
     "claimedBy": null,
@@ -589,7 +589,7 @@
   "1483891265253802085": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T18:14:07.193Z",
     "closed": true,
     "claimedBy": null,
@@ -603,7 +603,7 @@
   "1483892245181497395": {
     "guildId": "1351362266246680626",
     "openerId": "1269323619884859483",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:18:00.738Z",
     "closed": true,
     "claimedBy": null,
@@ -619,7 +619,7 @@
   "1483895423809880286": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T18:30:38.602Z",
     "closed": true,
     "claimedBy": null,
@@ -650,7 +650,7 @@
   "1483899238164467722": {
     "guildId": "1351362266246680626",
     "openerId": "1270120723838537803",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:45:47.982Z",
     "closed": true,
     "claimedBy": null,
@@ -665,7 +665,7 @@
   "1483901820219822123": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:56:03.597Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -680,7 +680,7 @@
   "1483902380029509792": {
     "guildId": "1351362266246680626",
     "openerId": "1270120723838537803",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:58:17.080Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -695,7 +695,7 @@
   "1483902428762865815": {
     "guildId": "1351362266246680626",
     "openerId": "1339081114492469248",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T18:58:28.700Z",
     "closed": true,
     "claimedBy": "1379870737443328070",
@@ -710,7 +710,7 @@
   "1483904130261975361": {
     "guildId": "1351362266246680626",
     "openerId": "1128067079065571429",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:05:14.470Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -725,7 +725,7 @@
   "1483904568503959564": {
     "guildId": "1351362266246680626",
     "openerId": "1180704753173418004",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:06:58.830Z",
     "closed": true,
     "claimedBy": "1180704753173418004",
@@ -740,13 +740,13 @@
   "1483904912042496152": {
     "guildId": "1351362266246680626",
     "openerId": "1379616857232769168",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:08:20.781Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
     "answers": {
       "How old are you?": "I am 13 years old",
-      "What roster are you joining as?": "Void roster"
+      "What roster are you joining as?": "roster"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -755,13 +755,13 @@
   "1483905548352229619": {
     "guildId": "1351362266246680626",
     "openerId": "1379616857232769168",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:10:52.373Z",
     "closed": true,
     "claimedBy": "1015976575981858826",
     "answers": {
       "How old are you?": "I am 13 years old",
-      "What roster are you joining as?": "Void grinder!"
+      "What roster are you joining as?": "grinder!"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -770,7 +770,7 @@
   "1483905853622059089": {
     "guildId": "1351362266246680626",
     "openerId": "1266276888779689995",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:12:05.466Z",
     "closed": true,
     "claimedBy": "1084180646739587102",
@@ -800,7 +800,7 @@
   "1483906127346536640": {
     "guildId": "1351362266246680626",
     "openerId": "1453865280454529136",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:13:10.644Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -830,7 +830,7 @@
   "1483907527258411181": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:18:44.244Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -845,7 +845,7 @@
   "1483907892561313913": {
     "guildId": "1351362266246680626",
     "openerId": "1339081114492469248",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:20:11.283Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -860,7 +860,7 @@
   "1483910606892302387": {
     "guildId": "1351362266246680626",
     "openerId": "1266045068456755201",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:30:58.597Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -875,13 +875,13 @@
   "1483914113129255072": {
     "guildId": "1351362266246680626",
     "openerId": "1478877144862949477",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:44:54.358Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
     "answers": {
       "How old are you?": "13",
-      "What roster are you joining as?": "Void roster"
+      "What roster are you joining as?": "roster"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -890,7 +890,7 @@
   "1483914675531022478": {
     "guildId": "1351362266246680626",
     "openerId": "1258666688031756370",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:47:08.433Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -905,7 +905,7 @@
   "1483915127492186142": {
     "guildId": "1351362266246680626",
     "openerId": "1258666688031756370",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:48:56.210Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -920,13 +920,13 @@
   "1483917733463851075": {
     "guildId": "1351362266246680626",
     "openerId": "1441708417898250251",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:59:17.535Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
     "answers": {
       "How old are you?": "16",
-      "What roster are you joining as?": "VOID GRIND"
+      "What roster are you joining as?": "GRIND"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -935,7 +935,7 @@
   "1483917812627144825": {
     "guildId": "1351362266246680626",
     "openerId": "1283336018115952772",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T19:59:36.437Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -950,7 +950,7 @@
   "1483918358226272459": {
     "guildId": "1351362266246680626",
     "openerId": "1350212049975902379",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T20:01:46.517Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -965,7 +965,7 @@
   "1483918498387460196": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T20:02:19.939Z",
     "closed": true,
     "claimedBy": null,
@@ -981,7 +981,7 @@
   "1483918771834978465": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T20:03:25.218Z",
     "closed": true,
     "claimedBy": "1385881439102439484",
@@ -997,7 +997,7 @@
   "1483920412567146719": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T20:09:56.441Z",
     "closed": true,
     "claimedBy": "1385881439102439484",
@@ -1013,7 +1013,7 @@
   "1483921618937053205": {
     "guildId": "1351362266246680626",
     "openerId": "1402762321494937702",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T20:14:43.944Z",
     "closed": false,
     "claimedBy": "1346637261189419148",
@@ -1029,7 +1029,7 @@
   "1483922758516871370": {
     "guildId": "1351362266246680626",
     "openerId": "429372266329931777",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T20:19:15.666Z",
     "closed": true,
     "claimedBy": "1471986527625281616",
@@ -1044,7 +1044,7 @@
   "1483929313542799541": {
     "guildId": "1351362266246680626",
     "openerId": "1380108789784641630",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T20:45:18.963Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1059,7 +1059,7 @@
   "1483930906757431400": {
     "guildId": "1351362266246680626",
     "openerId": "1287758362196578306",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T20:51:38.208Z",
     "closed": true,
     "claimedBy": "1378458353130405999",
@@ -1074,7 +1074,7 @@
   "1483930922482139280": {
     "guildId": "1351362266246680626",
     "openerId": "1442199312959275008",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T20:51:42.136Z",
     "closed": false,
     "claimedBy": "1346637261189419148",
@@ -1090,7 +1090,7 @@
   "1483932094777397248": {
     "guildId": "1351362266246680626",
     "openerId": "1334249258777444417",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T20:56:22.002Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1105,13 +1105,13 @@
   "1483933402619969569": {
     "guildId": "1351362266246680626",
     "openerId": "1452378706101272760",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:01:33.493Z",
     "closed": true,
     "claimedBy": "1048590283530571798",
     "answers": {
       "How old are you?": "14",
-      "What roster are you joining as?": "Void grinder"
+      "What roster are you joining as?": "grinder"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -1120,7 +1120,7 @@
   "1483934404895309925": {
     "guildId": "1351362266246680626",
     "openerId": "1457200545474543812",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T21:05:32.310Z",
     "closed": true,
     "claimedBy": null,
@@ -1136,7 +1136,7 @@
   "1483934787499462817": {
     "guildId": "1351362266246680626",
     "openerId": "1457200545474543812",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T21:07:03.534Z",
     "closed": true,
     "claimedBy": null,
@@ -1152,7 +1152,7 @@
   "1483935559360581934": {
     "guildId": "1351362266246680626",
     "openerId": "1313994062998540390",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T21:10:07.486Z",
     "closed": true,
     "claimedBy": null,
@@ -1168,7 +1168,7 @@
   "1483935825791029248": {
     "guildId": "1351362266246680626",
     "openerId": "1282825847962734714",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:11:10.987Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1183,7 +1183,7 @@
   "1483937140545949756": {
     "guildId": "1351362266246680626",
     "openerId": "1482103323065581610",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:16:24.613Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1198,7 +1198,7 @@
   "1483938467359752422": {
     "guildId": "1351362266246680626",
     "openerId": "1421274000792752280",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:21:40.866Z",
     "closed": true,
     "claimedBy": "1333141939184336908",
@@ -1213,7 +1213,7 @@
   "1483938993681731604": {
     "guildId": "1351362266246680626",
     "openerId": "741769864238071838",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:23:46.539Z",
     "closed": true,
     "claimedBy": "709131423214207068",
@@ -1228,7 +1228,7 @@
   "1483939035440484575": {
     "guildId": "1351362266246680626",
     "openerId": "1188460012838846535",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:23:56.458Z",
     "closed": true,
     "claimedBy": "1180704753173418004",
@@ -1243,7 +1243,7 @@
   "1483939241120632903": {
     "guildId": "1351362266246680626",
     "openerId": "1334249258777444417",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:24:45.248Z",
     "closed": true,
     "claimedBy": "709131423214207068",
@@ -1258,7 +1258,7 @@
   "1483939392749047888": {
     "guildId": "1351362266246680626",
     "openerId": "1398505661679271996",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T21:25:21.484Z",
     "closed": true,
     "claimedBy": null,
@@ -1274,7 +1274,7 @@
   "1483939642968506459": {
     "guildId": "1351362266246680626",
     "openerId": "1282825847962734714",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:26:21.090Z",
     "closed": true,
     "claimedBy": "709131423214207068",
@@ -1289,7 +1289,7 @@
   "1483940488083017789": {
     "guildId": "1351362266246680626",
     "openerId": "1367309645718229012",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:29:42.623Z",
     "closed": true,
     "claimedBy": "709131423214207068",
@@ -1319,7 +1319,7 @@
   "1483944314592825467": {
     "guildId": "1351362266246680626",
     "openerId": "1477440982508240967",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:44:54.904Z",
     "closed": true,
     "claimedBy": "1015976575981858826",
@@ -1334,7 +1334,7 @@
   "1483944479982489775": {
     "guildId": "1351362266246680626",
     "openerId": "1188460012838846535",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:45:34.381Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1349,13 +1349,13 @@
   "1483945494215655434": {
     "guildId": "1351362266246680626",
     "openerId": "1142885566053109950",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:49:36.202Z",
     "closed": true,
     "claimedBy": "1180704753173418004",
     "answers": {
       "How old are you?": "13",
-      "What roster are you joining as?": "Void grinder"
+      "What roster are you joining as?": "grinder"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -1364,7 +1364,7 @@
   "1483945621776896110": {
     "guildId": "1351362266246680626",
     "openerId": "921716931193634816",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:50:06.691Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1379,7 +1379,7 @@
   "1483946980622471390": {
     "guildId": "1351362266246680626",
     "openerId": "1302158965580365866",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T21:55:30.510Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1394,7 +1394,7 @@
   "1483947266325614622": {
     "guildId": "1351362266246680626",
     "openerId": "1436496469958983800",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T21:56:38.710Z",
     "closed": true,
     "claimedBy": "1346637261189419148",
@@ -1410,7 +1410,7 @@
   "1483948984342155274": {
     "guildId": "1351362266246680626",
     "openerId": "1287758362196578306",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T22:03:28.338Z",
     "closed": true,
     "claimedBy": "1346637261189419148",
@@ -1426,7 +1426,7 @@
   "1483949278064939121": {
     "guildId": "1351362266246680626",
     "openerId": "1398505661679271996",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T22:04:38.238Z",
     "closed": true,
     "claimedBy": "1346637261189419148",
@@ -1442,7 +1442,7 @@
   "1483950214879645717": {
     "guildId": "1351362266246680626",
     "openerId": "1460392099940798537",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T22:08:21.582Z",
     "closed": false,
     "claimedBy": null,
@@ -1458,7 +1458,7 @@
   "1483950240829804565": {
     "guildId": "1351362266246680626",
     "openerId": "1404921303164518472",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:08:27.770Z",
     "closed": true,
     "claimedBy": "1387910075137396878",
@@ -1473,13 +1473,13 @@
   "1483952295598100641": {
     "guildId": "1351362266246680626",
     "openerId": "1477041192007893155",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:16:37.661Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
     "answers": {
       "How old are you?": "I am 13 old",
-      "What roster are you joining as?": "Void Grinder"
+      "What roster are you joining as?": "Grinder"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -1488,7 +1488,7 @@
   "1483953000337899691": {
     "guildId": "1351362266246680626",
     "openerId": "811658121361096722",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:19:25.704Z",
     "closed": true,
     "claimedBy": "709131423214207068",
@@ -1503,13 +1503,13 @@
   "1483953411106930778": {
     "guildId": "1351362266246680626",
     "openerId": "1319374842998554644",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:21:03.671Z",
     "closed": true,
     "claimedBy": "1273343051254857731",
     "answers": {
       "How old are you?": "13",
-      "What roster are you joining as?": "void grinder"
+      "What roster are you joining as?": "grinder"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -1518,13 +1518,13 @@
   "1483956220330246165": {
     "guildId": "1351362266246680626",
     "openerId": "1477041192007893155",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:32:13.449Z",
     "closed": true,
     "claimedBy": "1387910075137396878",
     "answers": {
       "How old are you?": "I am 13 old",
-      "What roster are you joining as?": "Void Grinder"
+      "What roster are you joining as?": "Grinder"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -1533,7 +1533,7 @@
   "1483957499379056660": {
     "guildId": "1351362266246680626",
     "openerId": "1481816807202357330",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:37:18.324Z",
     "closed": true,
     "claimedBy": "1333141939184336908",
@@ -1548,7 +1548,7 @@
   "1483958428798943332": {
     "guildId": "1351362266246680626",
     "openerId": "1444432584263209113",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:41:00.006Z",
     "closed": true,
     "claimedBy": "1333141939184336908",
@@ -1563,7 +1563,7 @@
   "1483958566732693514": {
     "guildId": "1351362266246680626",
     "openerId": "621360394606346251",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:41:34.688Z",
     "closed": true,
     "claimedBy": "1333141939184336908",
@@ -1578,7 +1578,7 @@
   "1483960855946068210": {
     "guildId": "1351362266246680626",
     "openerId": "1348409317728063508",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:50:38.749Z",
     "closed": true,
     "claimedBy": "1387910075137396878",
@@ -1593,7 +1593,7 @@
   "1483962051129905313": {
     "guildId": "1351362266246680626",
     "openerId": "840200792388141096",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:55:23.650Z",
     "closed": true,
     "claimedBy": "1387910075137396878",
@@ -1608,7 +1608,7 @@
   "1483963170736308254": {
     "guildId": "1351362266246680626",
     "openerId": "735482693860458547",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T22:59:50.743Z",
     "closed": true,
     "claimedBy": "709131423214207068",
@@ -1623,7 +1623,7 @@
   "1483964092283752611": {
     "guildId": "1351362266246680626",
     "openerId": "1390387093641105480",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T23:03:31.240Z",
     "closed": true,
     "claimedBy": null,
@@ -1639,7 +1639,7 @@
   "1483964540751184028": {
     "guildId": "1351362266246680626",
     "openerId": "1348409317728063508",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T23:05:17.386Z",
     "closed": true,
     "claimedBy": "1346637261189419148",
@@ -1655,7 +1655,7 @@
   "1483964955072921640": {
     "guildId": "1351362266246680626",
     "openerId": "1387910075137396878",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T23:06:56.057Z",
     "closed": true,
     "claimedBy": "1273343051254857731",
@@ -1670,7 +1670,7 @@
   "1483967875021537450": {
     "guildId": "1351362266246680626",
     "openerId": "1348409317728063508",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T23:18:32.366Z",
     "closed": true,
     "claimedBy": null,
@@ -1686,7 +1686,7 @@
   "1483967906764030144": {
     "guildId": "1351362266246680626",
     "openerId": "1339081114492469248",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T23:18:39.972Z",
     "closed": true,
     "claimedBy": "1273343051254857731",
@@ -1701,7 +1701,7 @@
   "1483969409625231480": {
     "guildId": "1351362266246680626",
     "openerId": "1348409317728063508",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T23:24:38.229Z",
     "closed": true,
     "claimedBy": null,
@@ -1717,7 +1717,7 @@
   "1483969518198853734": {
     "guildId": "1351362266246680626",
     "openerId": "1433131763567431765",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T23:25:04.302Z",
     "closed": false,
     "claimedBy": null,
@@ -1733,7 +1733,7 @@
   "1483971384404344982": {
     "guildId": "1351362266246680626",
     "openerId": "1367949089206960128",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-18T23:32:29.033Z",
     "closed": true,
     "claimedBy": "1273343051254857731",
@@ -1748,7 +1748,7 @@
   "1483977235886248127": {
     "guildId": "1351362266246680626",
     "openerId": "1479958317668499578",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-18T23:55:44.207Z",
     "closed": true,
     "claimedBy": null,
@@ -1764,7 +1764,7 @@
   "1483980552414695676": {
     "guildId": "1351362266246680626",
     "openerId": "757341216286179435",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T00:08:55.079Z",
     "closed": false,
     "claimedBy": "1279962196482199699",
@@ -1780,7 +1780,7 @@
   "1483982238239690784": {
     "guildId": "1351362266246680626",
     "openerId": "1083839133904023573",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T00:15:36.993Z",
     "closed": true,
     "claimedBy": null,
@@ -1796,7 +1796,7 @@
   "1483983741800943717": {
     "guildId": "1351362266246680626",
     "openerId": "1457200545474543812",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T00:21:35.442Z",
     "closed": true,
     "claimedBy": null,
@@ -1812,13 +1812,13 @@
   "1483984763009368126": {
     "guildId": "1351362266246680626",
     "openerId": "1083839133904023573",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T00:25:38.808Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
     "answers": {
       "How old are you?": "i am 16 years",
-      "What roster are you joining as?": "void grinder"
+      "What roster are you joining as?": "grinder"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -1827,7 +1827,7 @@
   "1483989714733371556": {
     "guildId": "1351362266246680626",
     "openerId": "1324493232754790410",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T00:45:19.443Z",
     "closed": true,
     "claimedBy": "1279962196482199699",
@@ -1843,7 +1843,7 @@
   "1483990268578496522": {
     "guildId": "1351362266246680626",
     "openerId": "849807841014448198",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T00:47:31.515Z",
     "closed": true,
     "claimedBy": "1015976575981858826",
@@ -1858,7 +1858,7 @@
   "1483993574638092288": {
     "guildId": "1351362266246680626",
     "openerId": "1453864517464490197",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T01:00:39.677Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1873,7 +1873,7 @@
   "1483995384945836073": {
     "guildId": "1351362266246680626",
     "openerId": "1449823856456896735",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T01:07:51.258Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1888,7 +1888,7 @@
   "1483995973343645777": {
     "guildId": "1351362266246680626",
     "openerId": "1449823856456896735",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T01:10:11.572Z",
     "closed": true,
     "claimedBy": "1290295958415999028",
@@ -1904,7 +1904,7 @@
   "1483999197970825317": {
     "guildId": "1351362266246680626",
     "openerId": "1467282599020859483",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T01:23:00.363Z",
     "closed": true,
     "claimedBy": "1483189846217326635",
@@ -1919,7 +1919,7 @@
   "1484004417740214292": {
     "guildId": "1351362266246680626",
     "openerId": "1420608859122307112",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T01:43:45.263Z",
     "closed": true,
     "claimedBy": "1279962196482199699",
@@ -1935,7 +1935,7 @@
   "1484009507377119355": {
     "guildId": "1351362266246680626",
     "openerId": "1457200545474543812",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T02:03:58.422Z",
     "closed": true,
     "claimedBy": null,
@@ -1951,13 +1951,13 @@
   "1484013024007426058": {
     "guildId": "1351362266246680626",
     "openerId": "1388963919066038302",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T02:17:56.876Z",
     "closed": true,
     "claimedBy": "1248403449465536594",
     "answers": {
       "How old are you?": "I am 13 years old",
-      "What roster are you joining as?": "Void Grinder"
+      "What roster are you joining as?": "Grinder"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -1966,7 +1966,7 @@
   "1484018385162604566": {
     "guildId": "1351362266246680626",
     "openerId": "1400507000265113707",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T02:39:15.137Z",
     "closed": true,
     "claimedBy": "1248403449465536594",
@@ -1981,7 +1981,7 @@
   "1484018774578299054": {
     "guildId": "1351362266246680626",
     "openerId": "1483189846217326635",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T02:40:47.837Z",
     "closed": true,
     "claimedBy": null,
@@ -1997,7 +1997,7 @@
   "1484022777722830960": {
     "guildId": "1351362266246680626",
     "openerId": "1462882208560975963",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T02:56:42.377Z",
     "closed": true,
     "claimedBy": "1248403449465536594",
@@ -2012,7 +2012,7 @@
   "1484027315523682515": {
     "guildId": "1351362266246680626",
     "openerId": "1145061121670262875",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T03:14:44.159Z",
     "closed": false,
     "claimedBy": "709131423214207068",
@@ -2027,7 +2027,7 @@
   "1484031555964899470": {
     "guildId": "1351362266246680626",
     "openerId": "1325601625548652584",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T03:31:35.409Z",
     "closed": true,
     "claimedBy": "1015976575981858826",
@@ -2042,7 +2042,7 @@
   "1484036040137379880": {
     "guildId": "1351362266246680626",
     "openerId": "1185623192052695070",
-    "type": "Void Staff Team",
+    "type": "Staff Team",
     "createdAt": "2026-03-19T03:49:24.300Z",
     "closed": true,
     "claimedBy": null,
@@ -2058,13 +2058,13 @@
   "1484040546237550672": {
     "guildId": "1351362266246680626",
     "openerId": "1339081114492469248",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T04:07:18.541Z",
     "closed": true,
     "claimedBy": "1453809633335578797",
     "answers": {
       "How old are you?": "i am 13",
-      "What roster are you joining as?": "i would like to apply for void grinder and void supporter please"
+      "What roster are you joining as?": "i would like to apply for grinder and supporter please"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -2073,13 +2073,13 @@
   "1484043644720775208": {
     "guildId": "1351362266246680626",
     "openerId": "1467366311784091820",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T04:19:37.317Z",
     "closed": true,
     "claimedBy": "709131423214207068",
     "answers": {
       "How old are you?": "15",
-      "What roster are you joining as?": "Void Grinder"
+      "What roster are you joining as?": "Grinder"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -2088,13 +2088,13 @@
   "1484045175075639396": {
     "guildId": "1351362266246680626",
     "openerId": "1377242455740649584",
-    "type": "Void Roster",
+    "type": "Roster",
     "createdAt": "2026-03-19T04:25:42.178Z",
     "closed": true,
     "claimedBy": "1387910075137396878",
     "answers": {
       "How old are you?": "16",
-      "What roster are you joining as?": "VOID GRIDER"
+      "What roster are you joining as?": "GRIDER"
     },
     "pingRoles": [
       "1444524137526853723"
@@ -2160,7 +2160,7 @@
   "1484061028064165958": {
     "guildId": "1483314155539923177",
     "openerId": "1447762659239006308",
-    "type": "Void Staff",
+    "type": "Staff",
     "createdAt": "2026-03-19T05:28:41.769Z",
     "closed": false,
     "claimedBy": null,
@@ -2346,7 +2346,7 @@
   "1484099468847747183": {
     "guildId": "1351362266246680626",
     "openerId": "1459195683318796414",
-    "type": "Void Staff",
+    "type": "Staff",
     "createdAt": "2026-03-19T08:01:26.817Z",
     "closed": true,
     "claimedBy": null,
@@ -2538,7 +2538,7 @@
   "1484134464518094998": {
     "guildId": "1351362266246680626",
     "openerId": "1417926221626605700",
-    "type": "Void Staff",
+    "type": "Staff",
     "createdAt": "2026-03-19T10:20:30.522Z",
     "closed": true,
     "claimedBy": null,
@@ -2600,7 +2600,7 @@
   "1484157661158178966": {
     "guildId": "1483314155539923177",
     "openerId": "1385881439102439484",
-    "type": "Void Staff",
+    "type": "Staff",
     "createdAt": "2026-03-19T11:52:40.885Z",
     "closed": false,
     "claimedBy": null,
@@ -2622,7 +2622,7 @@
   "1484158007213424810": {
     "guildId": "1351362266246680626",
     "openerId": "1417926221626605700",
-    "type": "Void Staff",
+    "type": "Staff",
     "createdAt": "2026-03-19T11:54:03.440Z",
     "closed": false,
     "claimedBy": null,
@@ -2728,7 +2728,7 @@
   "1484173960206618775": {
     "guildId": "1351362266246680626",
     "openerId": "1010885377093017652",
-    "type": "Void Staff",
+    "type": "Staff",
     "createdAt": "2026-03-19T12:57:27.057Z",
     "closed": true,
     "claimedBy": "1279962196482199699",
@@ -2768,7 +2768,7 @@
     "answers": {
       "What's your age?": "14",
       "What's your PR and Region?": "53 pr and NA central",
-      "Link your Tracker": "void khazki"
+      "Link your Tracker": "khazki"
     },
     "pingRoles": [
       "1444524086851141652"
@@ -2841,7 +2841,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484182624175128628": {
@@ -2852,7 +2852,7 @@
     "closed": true,
     "claimedBy": null,
     "answers": {
-      "What do you want to join void as?": "bdg",
+      "What role do you want to join as?": "bdg",
       "Link your socials here": "dgb"
     },
     "pingRoles": [
@@ -2863,7 +2863,7 @@
   "1484182752151601293": {
     "guildId": "1351362266246680626",
     "openerId": "1385881439102439484",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-19T13:32:23.218Z",
     "closed": true,
     "claimedBy": "1279962196482199699",
@@ -2907,13 +2907,13 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484185645214859406": {
     "guildId": "1351362266246680626",
     "openerId": "1309100070788009994",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-19T13:43:52.959Z",
     "closed": false,
     "claimedBy": "1279962196482199699",
@@ -2979,7 +2979,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484191931293630504": {
@@ -2990,7 +2990,7 @@
     "closed": false,
     "claimedBy": "1084180646739587102",
     "answers": {
-      "What do you want to join void as?": "junior content creator",
+      "What role do you want to join as?": "junior content creator",
       "Link your socials here": "https://twitch.tv/lion_tv2"
     },
     "pingRoles": [
@@ -3012,7 +3012,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484193780927037624": {
@@ -3029,7 +3029,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484202093710540883": {
@@ -3073,13 +3073,13 @@
   "1484206358042640445": {
     "guildId": "1351362266246680626",
     "openerId": "1402346886157046004",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-19T15:06:11.176Z",
     "closed": false,
     "claimedBy": null,
     "answers": {
       "Whats your age?": "15",
-      "Do you have any experience?": "past roles: Sr Manager @VoidGGs Trial Admin @EGYggs Co Chair @SarrowGGs COO @V8/P7 Sr Staff @CIH Founder @SolarGGs",
+      "Do you have any experience?": "past roles: Sr Manager @FormerTeam Trial Admin @EGYggs Co Chair @SarrowGGs COO @V8/P7 Sr Staff @CIH Founder @SolarGGs",
       "Link your resume if you have one": "dont have one"
     },
     "pingRoles": [
@@ -3095,7 +3095,7 @@
     "closed": false,
     "claimedBy": "1334134450849579112",
     "answers": {
-      "Whats the reason behind you opening this ticket?": "to be a editor for void esports"
+      "Whats the reason behind you opening this ticket?": "to be a editor for esports"
     },
     "pingRoles": [
       "1453854535746588855",
@@ -3117,7 +3117,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484213504582877215": {
@@ -3134,7 +3134,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484215676976758934": {
@@ -3168,13 +3168,13 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484217960619970610": {
     "guildId": "1351362266246680626",
     "openerId": "964921660635480134",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-19T15:52:17.577Z",
     "closed": true,
     "claimedBy": null,
@@ -3202,7 +3202,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484229119876272220": {
@@ -3236,7 +3236,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484235583848059030": {
@@ -3253,7 +3253,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484236690758565908": {
@@ -3321,7 +3321,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484251095781081261": {
@@ -3338,7 +3338,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484254809887473756": {
@@ -3429,7 +3429,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484264356224041040": {
@@ -3446,7 +3446,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484267068579774635": {
@@ -3463,7 +3463,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484269239824154816": {
@@ -3480,7 +3480,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484274404618797309": {
@@ -3516,7 +3516,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484277590872293517": {
@@ -3541,7 +3541,7 @@
   "1484279341058756739": {
     "guildId": "1351362266246680626",
     "openerId": "1434339701103530084",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-19T19:56:11.838Z",
     "closed": false,
     "claimedBy": null,
@@ -3569,7 +3569,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484279406955331707": {
@@ -3681,7 +3681,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484301790941020201": {
@@ -3698,13 +3698,13 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484304725250932837": {
     "guildId": "1351362266246680626",
     "openerId": "1481849529211818155",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-19T21:37:03.823Z",
     "closed": false,
     "claimedBy": null,
@@ -3751,7 +3751,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484307504199368884": {
@@ -3840,7 +3840,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484311387479216410": {
@@ -3857,7 +3857,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484313885711401042": {
@@ -3909,7 +3909,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484318059215851713": {
@@ -3926,7 +3926,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484321567356878979": {
@@ -3962,7 +3962,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484323719898992811": {
@@ -3979,7 +3979,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484324153837486284": {
@@ -4002,7 +4002,7 @@
   "1484325558056653010": {
     "guildId": "1351362266246680626",
     "openerId": "1462182562695872685",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-19T22:59:50.789Z",
     "closed": false,
     "claimedBy": "1346637261189419148",
@@ -4064,13 +4064,13 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484329195147628615": {
     "guildId": "1351362266246680626",
     "openerId": "1273343051254857731",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-19T23:14:17.997Z",
     "closed": true,
     "claimedBy": "1290295958415999028",
@@ -4098,7 +4098,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484333679281963159": {
@@ -4132,7 +4132,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484336447606624259": {
@@ -4149,7 +4149,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484339107093287115": {
@@ -4166,7 +4166,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484339504969154690": {
@@ -4183,7 +4183,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484340181053214800": {
@@ -4194,7 +4194,7 @@
     "closed": true,
     "claimedBy": null,
     "answers": {
-      "What do you want to join void as?": "editor",
+      "What role do you want to join as?": "editor",
       "Link your socials here": "https://www.youtube.com/@chillyfv"
     },
     "pingRoles": [
@@ -4216,7 +4216,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484341087387783179": {
@@ -4277,7 +4277,7 @@
   "1484349343929729185": {
     "guildId": "1351362266246680626",
     "openerId": "1384644202842816613",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-20T00:34:21.886Z",
     "closed": false,
     "claimedBy": "1346637261189419148",
@@ -4301,7 +4301,7 @@
     "answers": {
       "Whtas your age?": "14",
       "Whats your PR and Region?": "NA-EAST",
-      "Link your Fn tracker here": "Void M8NG0"
+      "Link your Fn tracker here": "M8NG0"
     },
     "pingRoles": [
       "1444524086851141652"
@@ -4322,7 +4322,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484351977881206897": {
@@ -4339,7 +4339,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484352734017753158": {
@@ -4356,7 +4356,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484360911362719965": {
@@ -4389,7 +4389,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484369290638397483": {
@@ -4400,7 +4400,7 @@
     "closed": false,
     "claimedBy": null,
     "answers": {
-      "What do you want to join void as?": "Content creator",
+      "What role do you want to join as?": "Content creator",
       "Link your socials here": "TikTok tech loop"
     },
     "pingRoles": [
@@ -4439,7 +4439,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484370691250720828": {
@@ -4456,7 +4456,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484371138573504654": {
@@ -4473,7 +4473,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484381356090986684": {
@@ -4585,13 +4585,13 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484403683578872000": {
     "guildId": "1351362266246680626",
     "openerId": "1456270410877239328",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-20T04:10:17.272Z",
     "closed": true,
     "claimedBy": null,
@@ -4608,7 +4608,7 @@
   "1484414921386233946": {
     "guildId": "1351362266246680626",
     "openerId": "1006251448318836827",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-20T04:54:56.566Z",
     "closed": false,
     "claimedBy": null,
@@ -4644,7 +4644,7 @@
   "1484452931007807508": {
     "guildId": "1351362266246680626",
     "openerId": "1382781502181474394",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-20T07:25:58.702Z",
     "closed": true,
     "claimedBy": null,
@@ -4708,7 +4708,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484482792271253515": {
@@ -4725,7 +4725,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484488295760003122": {
@@ -4742,7 +4742,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484495034525945856": {
@@ -4759,7 +4759,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484498388639813755": {
@@ -4793,13 +4793,13 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484500485175246868": {
     "guildId": "1351362266246680626",
     "openerId": "1268387273125134412",
-    "type": "🛠️ Void Staff",
+    "type": "🛠️ Staff",
     "createdAt": "2026-03-20T10:34:56.575Z",
     "closed": false,
     "claimedBy": null,
@@ -4827,7 +4827,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484502268488319157": {
@@ -4844,7 +4844,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484516341296664738": {
@@ -4880,7 +4880,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484522899174850640": {
@@ -4897,7 +4897,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484523748949360840": {
@@ -4969,7 +4969,7 @@
       "1444524137526853723"
     ],
     "fileQuestions": [
-      "Use \"team.void\" in fortnite item shop and send a ScreenShot"
+      "Send a screenshot from the Fortnite item shop"
     ]
   },
   "1484535804456865802": {

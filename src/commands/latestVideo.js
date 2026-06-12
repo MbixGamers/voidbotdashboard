@@ -4,7 +4,7 @@ const cache = require('../utils/cache');
 
 const latestVideoCommand = new SlashCommandBuilder()
   .setName('latest-video')
-  .setDescription('Get the latest YouTube video from Void Esports');
+  .setDescription('Get the latest YouTube video from Esports');
 
 // We'll reuse the fetch function from videos, but to avoid duplication we could move it to a shared util.
 // For simplicity, I'll copy the necessary functions here, but in a real codebase you'd extract them.
@@ -137,7 +137,7 @@ async function getLatestYouTubeVideo() {
 
 async function handleLatestVideo(interaction) {
   await interaction.editReply({ 
-    content: '🔍 Fetching latest YouTube video from Void Esports...', 
+    content: '🔍 Fetching latest YouTube video from Esports...',
     embeds: [], 
     components: [] 
   });
@@ -168,7 +168,7 @@ async function handleLatestVideo(interaction) {
       .setDescription(videoData.description ? videoData.description.substring(0, 4096) : 'No description available.')
       .setColor(0xFF0000)
       .setAuthor({ 
-        name: videoData.channelTitle || 'Void Esports', 
+        name: videoData.channelTitle || 'Esports',
         iconURL: 'https://cdn.discordapp.com/emojis/1448065395922702480.webp?size=128',
         url: `https://www.youtube.com/channel/${videoData.channelId}`
       })

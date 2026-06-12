@@ -14,7 +14,7 @@ function setBotStatus(client) {
 
   try {
     // Set a clean activity – no command listing.
-    client.user.setActivity('I ❤️ Void', {
+    client.user.setActivity('Advanced Bot', {
       type: ActivityType.Watching,
     });
 
