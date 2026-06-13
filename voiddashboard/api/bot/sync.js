@@ -139,7 +139,7 @@ export default async function handler(req, res) {
           auth_guild_id: settings.auth_guild_id,
           auth_role_id: settings.auth_role_id,
           auth_role_ids: settings.auth_role_ids || [],
-          tracked_role_ids: settings.auth_role_ids || []
+          tracked_role_ids: settings.tracked_role_ids || settings.auth_role_ids || []
         }
       });
     }

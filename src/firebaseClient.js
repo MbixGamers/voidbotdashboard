@@ -1,125 +1,90 @@
-const { initializeApp, cert } = require('firebase-admin/app');
-const { getFirestore } = require('firebase-admin/firestore');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs/promises');
 
-let db = null;
-let firebaseInfo = {
-  mode: 'uninitialized',
+const DATA_DIR = process.env.LOCAL_JSON_DB_DIR || path.join(__dirname, '..', 'localdb');
+
+const firebaseInfo = {
+  mode: 'local-json-storage',
   projectId: null,
   clientEmail: null,
   initError: null
 };
 
-function initFirestore() {
+async function readCollection(name) {
   try {
-    console.log('🔥 Initializing Firebase Admin using service-account.json...');
+    const raw = await fs.readFile(path.join(DATA_DIR, `${name}.json`), 'utf8');
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed && typeof parsed === 'object') return Object.entries(parsed).map(([id, data]) => ({ id, ...data }));
+    return [];
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    return [];
+  }
+}
 
-    const serviceAccountPath = path.join(__dirname, '..', 'service-account.json');
+function wrapDoc(row, index) {
+  return {
+    id: String(row.id || row.slug || index),
+    data: () => ({ ...row })
+  };
+}
 
-    if (!fs.existsSync(serviceAccountPath)) {
-      throw new Error(`service-account.json not found at ${serviceAccountPath}`);
+class LocalQuery {
+  constructor(name, operations = []) {
+    this.name = name;
+    this.operations = operations;
+  }
+
+  orderBy(field, direction = 'asc') {
+    return new LocalQuery(this.name, [...this.operations, { type: 'orderBy', field, direction }]);
+  }
+
+  limit(count) {
+    return new LocalQuery(this.name, [...this.operations, { type: 'limit', count: Number(count) || 0 }]);
+  }
+
+  async get() {
+    let rows = await readCollection(this.name);
+    for (const op of this.operations) {
+      if (op.type === 'orderBy') {
+        rows = [...rows].sort((a, b) => {
+          const av = a[op.field] || '';
+          const bv = b[op.field] || '';
+          const cmp = String(av).localeCompare(String(bv));
+          return op.direction === 'desc' ? -cmp : cmp;
+        });
+      }
+      if (op.type === 'limit' && op.count > 0) rows = rows.slice(0, op.count);
     }
-
-    const serviceAccount = require(serviceAccountPath);
-
-    console.log(`✅ Service account loaded: ${serviceAccount.project_id}`);
-
-    const app = initializeApp({
-      credential: cert(serviceAccount),
-      projectId: serviceAccount.project_id
-    });
-
-    db = getFirestore(app);
-
-    firebaseInfo = {
-      mode: 'admin-service-account-file',
-      projectId: serviceAccount.project_id,
-      clientEmail: serviceAccount.client_email,
-      initError: null
-    };
-
-    console.log(`✅ Firebase Admin connected successfully!`);
-    console.log(`📊 Project: ${serviceAccount.project_id}`);
-    console.log(`👤 Client Email: ${serviceAccount.client_email}`);
-
-    testConnection();
-
-  } catch (error) {
-    firebaseInfo = {
-      mode: 'failed',
-      projectId: null,
-      clientEmail: null,
-      initError: error?.message || String(error)
-    };
-    console.error('❌ Firebase Admin init error:', error);
+    const docs = rows.map(wrapDoc);
+    return { docs, size: docs.length, empty: docs.length === 0 };
   }
 }
-
-async function testConnection() {
-  try {
-    if (!db) return;
-
-    const testSnapshot = await db.collection('teams').limit(1).get();
-    console.log(`✅ Firebase connection test: can read from teams (${testSnapshot.size} docs)`);
-
-    const ambSnapshot = await db.collection('ambassadors').limit(1).get();
-    console.log(`✅ Firebase connection test: can read from ambassadors (${ambSnapshot.size} docs)`);
-
-  } catch (error) {
-    console.error('❌ Firebase connection test failed:', error);
-  }
-}
-
-initFirestore();
 
 const dbWrapper = {
   collection(name) {
-    if (!db) {
-      throw new Error('Firebase not initialized. Check your service account file.');
-    }
-    return db.collection(name);
+    return new LocalQuery(name);
   }
 };
 
 function getFirestoreInstance() {
-  if (!db) {
-    throw new Error('Firebase not initialized. Check your service account file.');
-  }
   return dbWrapper;
 }
 
 function convertFirestoreData(docSnap) {
   if (!docSnap) return null;
-
-  const data = docSnap.data();
-  const id = docSnap.id;
-
-  if (!data) return { id };
-
-  const converted = { id, ...data };
-
-  Object.keys(converted).forEach(key => {
+  const data = typeof docSnap.data === 'function' ? docSnap.data() : docSnap;
+  const converted = { id: docSnap.id || data.id, ...data };
+  Object.keys(converted).forEach((key) => {
     const value = converted[key];
-    if (value && typeof value === 'object' && typeof value.toDate === 'function') {
-      converted[key] = value.toDate().toISOString();
-    } else if (value && typeof value === 'object' && value._seconds !== undefined) {
-      converted[key] = new Date(value._seconds * 1000).toISOString();
-    } else if (Array.isArray(value)) {
-      converted[key] = value.map(item => {
-        if (item && typeof item === 'object' && typeof item.toDate === 'function') {
-          return item.toDate().toISOString();
-        }
-        if (item && typeof item === 'object' && item._seconds !== undefined) {
-          return new Date(item._seconds * 1000).toISOString();
-        }
-        return item;
-      });
-    }
+    if (value && typeof value === 'object' && typeof value.toDate === 'function') converted[key] = value.toDate().toISOString();
+    else if (value && typeof value === 'object' && value._seconds !== undefined) converted[key] = new Date(value._seconds * 1000).toISOString();
   });
-
   return converted;
 }
+
+console.log(`✅ Database disabled: using local JSON storage at ${DATA_DIR}`);
 
 module.exports = {
   getFirestoreInstance,

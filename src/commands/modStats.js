@@ -917,7 +917,7 @@ async function handleTicketscan(interaction, page = 0) {
       return !repliers || repliers.size === 0;
     }).sort((a, b) => a.name.localeCompare(b.name));
 
-    const totalPages = Math.ceil(unrepliedChannels.length / ITEMS_PER_PAGE);
+    const totalPages = Math.max(1, Math.ceil(unrepliedChannels.length / ITEMS_PER_PAGE));
     const currentPage = Math.max(0, Math.min(page, totalPages - 1));
     const start = currentPage * ITEMS_PER_PAGE;
     const end = Math.min(start + ITEMS_PER_PAGE, unrepliedChannels.length);

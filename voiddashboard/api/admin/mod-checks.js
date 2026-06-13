@@ -31,8 +31,12 @@ export default async function handler(req, res) {
     const messageGoal = Math.max(0, Number(req.body?.message_goal || 0));
     const requestedAuthGuildId = req.body?.auth_guild_id !== undefined ? req.body.auth_guild_id : currentSettings.auth_guild_id;
     const requestedAuthRoleId = req.body?.auth_role_id !== undefined ? req.body.auth_role_id : currentSettings.auth_role_id;
+    const requestedTrackedRoleIds = req.body?.tracked_role_ids !== undefined ? req.body.tracked_role_ids : (currentSettings.tracked_role_ids || currentSettings.auth_role_ids || currentSettings.auth_role_id);
     const authGuildId = String(requestedAuthGuildId || '').trim();
     const authRoleId = String(requestedAuthRoleId || '').trim();
+    const trackedRoleIds = Array.isArray(requestedTrackedRoleIds)
+      ? requestedTrackedRoleIds
+      : String(requestedTrackedRoleIds || '').split(/[\n,]+/).map((id) => id.trim()).filter(Boolean);
     const adminDiscordIds = Array.isArray(req.body?.admin_discord_ids)
       ? req.body.admin_discord_ids
       : String(req.body?.admin_discord_ids || '')
@@ -42,11 +46,13 @@ export default async function handler(req, res) {
     const now = new Date().toISOString();
 
     if (!authGuildId) return sendJson(res, 400, { error: 'Discord server ID is required.' });
-    if (!authRoleId) return sendJson(res, 400, { error: 'At least one staff role ID is required.' });
+    if (!authRoleId) return sendJson(res, 400, { error: 'At least one dashboard access role ID is required.' });
+    if (!trackedRoleIds.length) return sendJson(res, 400, { error: 'At least one mod-command tracking role ID is required.' });
 
     const settings = await saveDashboardSettings({
       auth_guild_id: authGuildId,
       auth_role_id: authRoleId,
+      tracked_role_ids: trackedRoleIds,
       admin_discord_ids: adminDiscordIds,
       updated_by: discordId
     });
