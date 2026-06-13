@@ -5,7 +5,8 @@ const useSupabaseRest = Boolean(
 );
 
 function requireBotKey(req) {
-  const expected = process.env.DASHBOARD_BOT_API_KEY;
+  // Accept DASHBOARD_BOT_API_KEY (preferred) or the shorter DASHBOARD_BOT_API alias
+  const expected = process.env.DASHBOARD_BOT_API_KEY || process.env.DASHBOARD_BOT_API;
   const provided = req.headers['x-bot-api-key'];
   if (!expected || provided !== expected) {
     const error = new Error('Invalid bot API key');

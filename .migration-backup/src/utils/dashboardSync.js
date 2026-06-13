@@ -12,7 +12,8 @@ function isDashboardSyncConfigured() {
 
 function logSyncStatus() {
   if (!config.dashboardBaseUrl && !config.dashboardApiKey) {
-    console.warn('⚠️  Dashboard sync is DISABLED. Set DASHBOARD_BASE_URL and DASHBOARD_BOT_API_KEY in the bot environment to enable it.');
+    console.warn('⚠️  Dashboard sync is DISABLED.');
+    console.warn('   Set DASHBOARD_BASE_URL and DASHBOARD_BOT_API_KEY (or DASHBOARD_BOT_API) in the bot environment.');
     return;
   }
   if (!config.dashboardBaseUrl) {
@@ -20,10 +21,12 @@ function logSyncStatus() {
     return;
   }
   if (!config.dashboardApiKey) {
-    console.warn('⚠️  Dashboard sync is DISABLED. DASHBOARD_BOT_API_KEY is not set. Add it to both the bot and the Vercel dashboard environments.');
+    console.warn('⚠️  Dashboard sync is DISABLED. Neither DASHBOARD_BOT_API_KEY nor DASHBOARD_BOT_API is set.');
+    console.warn('   Add one of those to the bot environment, and set the same value as DASHBOARD_BOT_API_KEY on Vercel.');
     return;
   }
   console.log(`✅ Dashboard sync is ENABLED → ${config.dashboardBaseUrl}`);
+  console.log(`   API key loaded from: ${process.env.DASHBOARD_BOT_API_KEY ? 'DASHBOARD_BOT_API_KEY' : 'DASHBOARD_BOT_API'}`);
 }
 
 async function requestDashboard(path = '/api/bot/sync', options = {}) {

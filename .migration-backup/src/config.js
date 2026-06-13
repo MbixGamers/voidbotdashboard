@@ -97,7 +97,8 @@ module.exports = {
   ),
 
   dashboardBaseUrl: process.env.DASHBOARD_BASE_URL || null,
-  dashboardApiKey: process.env.DASHBOARD_BOT_API_KEY || null,
+  // Accept DASHBOARD_BOT_API_KEY (preferred) or the shorter DASHBOARD_BOT_API alias
+  dashboardApiKey: process.env.DASHBOARD_BOT_API_KEY || process.env.DASHBOARD_BOT_API || null,
   dashboardStaffRoleId: process.env.DASHBOARD_AUTH_ROLE_ID || process.env.DASHBOARD_STAFF_ROLE_ID || DEFAULT_STAFF_ACCESS_ROLE_ID,
   defaultGuildId: DEFAULT_GUILD_ID,
   mongoUri: process.env.MONGODB_URI || null,
