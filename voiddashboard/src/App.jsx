@@ -29,7 +29,8 @@ const fallbackDashboard = {
   settings: {
     auth_guild_id: '1454879351605690522',
     auth_role_id: '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560',
-    admin_discord_ids: []
+    admin_discord_ids: [],
+    tracked_role_ids: []
   },
   transcripts: [
     {
@@ -115,7 +116,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
-  const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100, auth_guild_id: '1454879351605690522', auth_role_id: '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560', admin_discord_ids: '' });
+  const [modForm, setModForm] = useState({ weekly_ticket_goal: 30, message_goal: 100, auth_guild_id: '1454879351605690522', auth_role_id: '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560', tracked_role_ids: '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560', admin_discord_ids: '' });
   const [refreshingStaff, setRefreshingStaff] = useState(false);
 
   const loadDashboard = useCallback(async (activeSession) => {
@@ -141,7 +142,8 @@ function App() {
         message_goal: data.modCheck?.message_goal || 0,
         auth_guild_id: data.settings?.auth_guild_id || '1454879351605690522',
         auth_role_id: data.settings?.auth_role_id || '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560',
-        admin_discord_ids: (data.settings?.admin_discord_ids || []).join('\n')
+        admin_discord_ids: (data.settings?.admin_discord_ids || []).join('\n'),
+        tracked_role_ids: (data.settings?.tracked_role_ids || data.settings?.auth_role_id || '').toString()
       });
     } catch (error) {
       setNotice(error.message);
@@ -262,7 +264,8 @@ function App() {
           message_goal: Number(modForm.message_goal),
           auth_guild_id: modForm.auth_guild_id,
           auth_role_id: modForm.auth_role_id,
-          admin_discord_ids: modForm.admin_discord_ids
+          admin_discord_ids: modForm.admin_discord_ids,
+          tracked_role_ids: modForm.tracked_role_ids
         })
       });
       const data = await response.json();
@@ -272,7 +275,8 @@ function App() {
         ...current,
         auth_guild_id: data.settings?.auth_guild_id || current.auth_guild_id,
         auth_role_id: data.settings?.auth_role_id || current.auth_role_id,
-        admin_discord_ids: (data.settings?.admin_discord_ids || []).join('\n')
+        admin_discord_ids: (data.settings?.admin_discord_ids || []).join('\n'),
+        tracked_role_ids: (data.settings?.tracked_role_ids || current.tracked_role_ids || []).toString()
       }));
       setNotice('Dashboard requirements updated. Staff goals, authorization checks, and admin bypass IDs now use the new settings.');
       
@@ -427,7 +431,7 @@ function App() {
                 </div>
               </div>
               <div className="form-section">
-                <span className="form-section-title">Discord authorization</span>
+                <span className="form-section-title">Discord authorization and mod-command roles</span>
                 <div className="form-grid">
                   <label>
                     Required server ID
@@ -438,10 +442,17 @@ function App() {
                     />
                   </label>
                   <label>
-                    Tracked staff role ID(s)
+                    Dashboard access role ID(s)
                     <input
                       value={modForm.auth_role_id}
                       onChange={(event) => setModForm((current) => ({ ...current, auth_role_id: event.target.value.trim() }))}
+                    />
+                  </label>
+                  <label>
+                    Mod command tracked role ID(s)
+                    <input
+                      value={modForm.tracked_role_ids}
+                      onChange={(event) => setModForm((current) => ({ ...current, tracked_role_ids: event.target.value.trim() }))}
                     />
                   </label>
                   <label className="full-span">
@@ -454,7 +465,7 @@ function App() {
                     />
                   </label>
                 </div>
-                <p className="muted">Use one role ID, or comma-separate multiple staff role IDs. These roles control dashboard access and the bot's synced staff tracking for ticket claims/messages. Admin bypass IDs skip the server/role check and receive the same admin dashboard access as the master admin.</p>
+                <p className="muted">Use comma-separated role IDs. Access roles control dashboard login; mod-command roles are synced to the bot for /modget, /modinfo, /modcheck, ticket claims, ticket scan, and ticket-message stats. Admin bypass IDs skip server/role checks and receive admin panel access.</p>
               </div>
               <button className="button button-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save dashboard settings'}</button>
             </form>

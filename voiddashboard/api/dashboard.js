@@ -200,7 +200,8 @@ export default async function handler(req, res) {
       settings: {
         auth_guild_id: settings.auth_guild_id,
         auth_role_id: settings.auth_role_id,
-        admin_discord_ids: settings.admin_discord_ids || []
+        admin_discord_ids: settings.admin_discord_ids || [],
+        tracked_role_ids: settings.tracked_role_ids || settings.auth_role_ids || []
       }
     });
   } catch (error) {
