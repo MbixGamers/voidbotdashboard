@@ -3,7 +3,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const STORE_DIR = process.env.DASHBOARD_JSON_DIR || path.join(__dirname, '..', 'data');
+const isServerlessReadOnlyRuntime = Boolean(process.env.VERCEL) || __dirname.startsWith('/var/task');
+const DEFAULT_STORE_DIR = isServerlessReadOnlyRuntime ? path.join('/tmp', 'voiddashboard-data') : path.join(__dirname, '..', 'data');
+const STORE_DIR = process.env.DASHBOARD_JSON_DIR || DEFAULT_STORE_DIR;
 const STORE_FILE = process.env.DASHBOARD_JSON_FILE || path.join(STORE_DIR, 'dashboard-store.json');
 const anonKey = process.env.SUPABASE_ANON_KEY;
 
@@ -33,20 +35,35 @@ const DEFAULT_STORE = {
 
 let writeQueue = Promise.resolve();
 
+async function ensureStoreDirectory() {
+  try {
+    await fs.mkdir(STORE_DIR, { recursive: true });
+  } catch (error) {
+    const message = `Dashboard JSON storage directory is not writable: ${STORE_DIR}. `
+      + 'Set Supabase environment variables for persistent storage, or set DASHBOARD_JSON_DIR to a writable path such as /tmp/voiddashboard-data.';
+    error.message = `${message} Original error: ${error.message}`;
+    throw error;
+  }
+}
+
+async function createDefaultStoreFile() {
+  await ensureStoreDirectory();
+  await fs.writeFile(STORE_FILE, JSON.stringify(DEFAULT_STORE, null, 2), 'utf8');
+}
+
 async function readStore() {
   try {
     const raw = await fs.readFile(STORE_FILE, 'utf8');
     return { ...DEFAULT_STORE, ...JSON.parse(raw) };
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
-    await fs.mkdir(STORE_DIR, { recursive: true });
-    await fs.writeFile(STORE_FILE, JSON.stringify(DEFAULT_STORE, null, 2), 'utf8');
+    await createDefaultStoreFile();
     return structuredClone(DEFAULT_STORE);
   }
 }
 
 async function writeStore(store) {
-  await fs.mkdir(STORE_DIR, { recursive: true });
+  await ensureStoreDirectory();
   writeQueue = writeQueue.then(() => fs.writeFile(STORE_FILE, JSON.stringify(store, null, 2), 'utf8'));
   await writeQueue;
 }
