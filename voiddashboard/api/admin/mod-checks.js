@@ -54,6 +54,8 @@ export default async function handler(req, res) {
       auth_role_id: authRoleId,
       tracked_role_ids: trackedRoleIds,
       admin_discord_ids: adminDiscordIds,
+      weekly_ticket_goal: weeklyTicketGoal,
+      message_goal: messageGoal,
       updated_by: discordId
     });
 

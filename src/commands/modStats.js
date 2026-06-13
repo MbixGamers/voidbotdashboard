@@ -227,6 +227,15 @@ async function getRelevantMembers(guild, includeExceptions = true) {
     if (!role) continue;
     role.members.forEach(member => members.push(member));
   }
+
+  // Admins can claim tickets and reply to tickets too, so mod-checks must include them even
+  // when they do not also carry one of the tracked staff roles.
+  if (!includeExceptions) {
+    guild.members.cache
+      .filter(member => hasAdminAccess(member))
+      .forEach(member => members.push(member));
+  }
+
   const unique = new Map();
   members.forEach(m => unique.set(m.id, m));
   const memberList = Array.from(unique.values()).map(m => ({
@@ -415,6 +424,9 @@ async function handleModcheck(interaction, page = 0) {
       await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     }
 
+    await dashboardSync.fetchDashboardSettings({ force: true }).catch(() => {});
+    trackedOnlyCache = { timestamp: 0, members: [] };
+
     const guild = interaction.guild;
     const members = await getRelevantMembers(guild, false); // exclude exceptions
     if (members.length === 0) {
@@ -438,7 +450,7 @@ async function handleModcheck(interaction, page = 0) {
           highestRole = role;
         }
       });
-      const roleName = highestRole ? highestRole.name : 'Unknown';
+      const roleName = highestRole ? highestRole.name : (hasAdminAccess(memberObj) ? 'Admin' : 'Unknown');
 
       const tickets = ticketCounts[userId] || 0;   // claimed tickets
       const messages = messageCounts[userId] || 0;

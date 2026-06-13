@@ -92,6 +92,18 @@ where public.dashboard_settings.auth_guild_id = '1351362266246680626'
 alter table public.dashboard_settings
   add column if not exists admin_discord_ids text[] not null default '{}';
 
+alter table public.dashboard_settings
+  add column if not exists auth_role_ids text[] not null default '{}',
+  add column if not exists tracked_role_ids text[] not null default '{}',
+  add column if not exists weekly_ticket_goal integer not null default 0,
+  add column if not exists message_goal integer not null default 0;
+
+update public.dashboard_settings
+set auth_role_ids = string_to_array(auth_role_id, ','),
+    tracked_role_ids = string_to_array(auth_role_id, ',')
+where coalesce(array_length(auth_role_ids, 1), 0) = 0
+   or coalesce(array_length(tracked_role_ids, 1), 0) = 0;
+
 create table if not exists public.dashboard_message_events (
   message_id text primary key,
   discord_id text not null,
