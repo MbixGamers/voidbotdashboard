@@ -1037,6 +1037,15 @@ function initModStats(client) {
       });
   }, Number(process.env.DASHBOARD_SETTINGS_REFRESH_MS || 5 * 60 * 1000));
 
+  // Periodically re-sync all known staff stats so the dashboard stays accurate
+  // even if individual events were missed (e.g. bot restart, network errors).
+  const SNAPSHOT_SYNC_INTERVAL_MS = Number(process.env.DASHBOARD_SNAPSHOT_SYNC_MS || 10 * 60 * 1000);
+  setInterval(() => {
+    syncDashboardSnapshots(client).catch(err => {
+      console.warn('⚠️ Periodic dashboard snapshot sync failed:', err.message);
+    });
+  }, SNAPSHOT_SYNC_INTERVAL_MS);
+
   client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;

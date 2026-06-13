@@ -53,6 +53,7 @@ const webhookProtection = require('./utils/webhookProtection');
 
 // Bot status
 const { setBotStatus } = require('./botStatus');
+const dashboardSync = require('./utils/dashboardSync');
 
 // Utilities
 const { parsePaginationCustomId } = require('./utils/pagination');
@@ -138,6 +139,9 @@ client.once(Events.ClientReady, async () => {
   discordReady = true;
   console.log(`✅ Discord bot ready: ${client.user.tag}`);
   console.log(`📊 Serving ${client.guilds.cache.size} server(s)`);
+
+  // Log dashboard sync status so it's immediately visible in bot logs
+  dashboardSync.logSyncStatus();
   
   // Register commands
   await registerCommands().catch(console.error);

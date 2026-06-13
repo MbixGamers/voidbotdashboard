@@ -1,5 +1,9 @@
 import { getDashboardSettings, handleApiError, insertRows, selectRows, sendJson, upsertProfile, upsertRows } from '../_supabase.js';
 
+const useSupabaseRest = Boolean(
+  process.env.SUPABASE_URL && (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE)
+);
+
 function requireBotKey(req) {
   const expected = process.env.DASHBOARD_BOT_API_KEY;
   const provided = req.headers['x-bot-api-key'];
@@ -8,6 +12,27 @@ function requireBotKey(req) {
     error.statusCode = 401;
     throw error;
   }
+}
+
+// On Vercel, each serverless function invocation runs in an isolated Lambda
+// container with its own ephemeral /tmp. Without Supabase, data written by
+// one invocation is invisible to every other invocation — stats are silently
+// lost. Reject sync writes so the bot sees the error in its logs instead.
+function requireSupabase(res) {
+  if (!useSupabaseRest) {
+    console.error(
+      '❌ Dashboard bot sync requires Supabase. Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY ' +
+      'to Vercel environment variables, then redeploy. ' +
+      'Without Supabase, stats written by the bot are lost between serverless function invocations.'
+    );
+    sendJson(res, 503, {
+      error: 'Dashboard data storage is not configured. ' +
+        'Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your Vercel environment variables and redeploy. ' +
+        'The JSON file fallback does not work on Vercel because each function invocation runs in an isolated container.'
+    });
+    return false;
+  }
+  return true;
 }
 
 function weekStart(date = new Date()) {
@@ -113,11 +138,7 @@ async function syncTranscript(payload) {
 function getRequestBody(req) {
   if (!req.body) return {};
   if (typeof req.body === 'string' || Buffer.isBuffer(req.body)) {
-    try {
-      return JSON.parse(req.body.toString());
-    } catch {
-      return {};
-    }
+    try { return JSON.parse(req.body.toString()); } catch { return {}; }
   }
   return req.body;
 }
@@ -132,9 +153,11 @@ export default async function handler(req, res) {
     requireBotKey(req);
 
     if (req.method === 'GET') {
+      // Settings reads work even without Supabase (uses defaults)
       const settings = await getDashboardSettings();
       return sendJson(res, 200, {
         ok: true,
+        supabase_configured: useSupabaseRest,
         settings: {
           auth_guild_id: settings.auth_guild_id,
           auth_role_id: settings.auth_role_id,
@@ -143,6 +166,10 @@ export default async function handler(req, res) {
         }
       });
     }
+
+    // POST — requires Supabase for data to persist across Vercel invocations
+    if (!requireSupabase(res)) return;
+
     const body = getRequestBody(req);
     const event = body?.event;
     const payload = body?.payload || {};

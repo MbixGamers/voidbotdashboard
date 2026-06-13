@@ -10,6 +10,22 @@ function isDashboardSyncConfigured() {
   return Boolean(config.dashboardBaseUrl && config.dashboardApiKey);
 }
 
+function logSyncStatus() {
+  if (!config.dashboardBaseUrl && !config.dashboardApiKey) {
+    console.warn('⚠️  Dashboard sync is DISABLED. Set DASHBOARD_BASE_URL and DASHBOARD_BOT_API_KEY in the bot environment to enable it.');
+    return;
+  }
+  if (!config.dashboardBaseUrl) {
+    console.warn('⚠️  Dashboard sync is DISABLED. DASHBOARD_BASE_URL is not set (e.g. https://your-dashboard.vercel.app).');
+    return;
+  }
+  if (!config.dashboardApiKey) {
+    console.warn('⚠️  Dashboard sync is DISABLED. DASHBOARD_BOT_API_KEY is not set. Add it to both the bot and the Vercel dashboard environments.');
+    return;
+  }
+  console.log(`✅ Dashboard sync is ENABLED → ${config.dashboardBaseUrl}`);
+}
+
 async function requestDashboard(path = '/api/bot/sync', options = {}) {
   if (!isDashboardSyncConfigured()) return null;
 
@@ -31,13 +47,18 @@ async function requestDashboard(path = '/api/bot/sync', options = {}) {
 
     if (!response.ok) {
       const body = await response.text().catch(() => '');
-      console.warn(`⚠️ Dashboard request failed for ${path}: ${response.status} ${body}`);
+      // Surface the specific error so admins can diagnose (e.g. Supabase not configured on Vercel)
+      console.warn(`⚠️  Dashboard sync failed for ${path}: HTTP ${response.status} — ${body.slice(0, 300)}`);
       return null;
     }
 
     return response.json().catch(() => null);
   } catch (error) {
-    console.warn(`⚠️ Dashboard request error for ${path}:`, error.message);
+    if (error.name === 'AbortError') {
+      console.warn(`⚠️  Dashboard sync timed out for ${path} after ${timeoutMs}ms`);
+    } else {
+      console.warn(`⚠️  Dashboard sync error for ${path}:`, error.message);
+    }
     return null;
   } finally {
     clearTimeout(timeout);
@@ -51,7 +72,6 @@ async function postDashboardEvent(event, payload) {
   });
 }
 
-
 function normalizeRoleIds(value) {
   const ids = Array.isArray(value) ? value : String(value || '').split(/[,\n]+/);
   return Array.from(new Set(ids.map(id => String(id).trim()).filter(Boolean)));
@@ -64,7 +84,7 @@ async function fetchDashboardSettings({ force = false } = {}) {
     return dashboardSettingsCache.settings;
   }
 
-  const data = await requestDashboard('/api/bot/sync?resource=settings', { method: 'GET' });
+  const data = await requestDashboard('/api/bot/sync', { method: 'GET' });
   const settings = data?.settings;
   if (!settings) return dashboardSettingsCache.settings;
 
@@ -115,7 +135,6 @@ async function syncStaffMessage(user, message = null) {
   });
 }
 
-
 async function syncStaffSnapshot(user, stats = {}) {
   return postDashboardEvent('staff_stat', {
     ...userPayload(user),
@@ -153,6 +172,7 @@ async function syncTicketTranscript(payload) {
 
 module.exports = {
   isDashboardSyncConfigured,
+  logSyncStatus,
   fetchDashboardSettings,
   getCachedDashboardSettings,
   syncStaffMessage,
