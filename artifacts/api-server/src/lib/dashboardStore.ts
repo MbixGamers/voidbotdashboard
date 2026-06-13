@@ -223,7 +223,7 @@ export async function insertRows(table: string, rows: AnyRecord[]): Promise<AnyR
     });
     return Array.isArray(response) ? response : [];
   }
-  const withIds = rows.map((row) => ({
+  const withIds: AnyRecord[] = rows.map((row) => ({
     id: row.id || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
     created_at: row.created_at || new Date().toISOString(),
     ...row,
@@ -300,7 +300,7 @@ export async function verifySupabaseToken(accessToken: string): Promise<AnyRecor
   const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
     headers: { apikey: anonKey, Authorization: `Bearer ${accessToken}` },
   });
-  const data = await response.json().catch(() => null);
+  const data = await response.json().catch(() => null) as AnyRecord | null;
   if (!response.ok || !data?.id) {
     const e = new Error(
       data?.msg || data?.message || "Invalid or expired authorization token",
@@ -308,7 +308,7 @@ export async function verifySupabaseToken(accessToken: string): Promise<AnyRecor
     e.statusCode = 401;
     throw e;
   }
-  return data;
+  return data as AnyRecord;
 }
 
 export function getDiscordId(user: AnyRecord): string | null {
@@ -443,7 +443,7 @@ export async function fetchDiscordGuildMember(
     `https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`,
     { headers: { Authorization: `Bot ${token}` } },
   );
-  const m = await r.json().catch(() => null);
+  const m = await r.json().catch(() => null) as AnyRecord | null;
   if (!r.ok) {
     const e = new Error(m?.message || "Could not verify Discord server membership") as Error & {
       statusCode: number;
@@ -451,7 +451,7 @@ export async function fetchDiscordGuildMember(
     e.statusCode = r.status;
     throw e;
   }
-  return m;
+  return m as AnyRecord;
 }
 
 export async function fetchDiscordGuildMembers(
@@ -476,9 +476,9 @@ export async function fetchDiscordGuildMembers(
       `https://discord.com/api/v10/guilds/${guildId}/members?${params}`,
       { headers: { Authorization: `Bot ${token}` } },
     );
-    const p = await r.json().catch(() => null);
+    const p = await r.json().catch(() => null) as AnyRecord[] | AnyRecord | null;
     if (!r.ok) {
-      const e = new Error(p?.message || "Could not load Discord guild members") as Error & {
+      const e = new Error((p as AnyRecord)?.message || "Could not load Discord guild members") as Error & {
         statusCode: number;
       };
       e.statusCode = r.status;
@@ -502,7 +502,7 @@ export async function fetchDiscordCurrentUserGuildMember(
   const userResponse = await fetch("https://discord.com/api/v10/users/@me", {
     headers: { Authorization: `Bearer ${discordAccessToken}` },
   });
-  const user = await userResponse.json().catch(() => null);
+  const user = await userResponse.json().catch(() => null) as AnyRecord | null;
   if (!userResponse.ok || String(user?.id || "") !== String(discordId)) {
     const e = new Error(
       "Discord OAuth token did not match the signed-in dashboard user. Please sign out and sign in again.",
@@ -514,7 +514,7 @@ export async function fetchDiscordCurrentUserGuildMember(
     `https://discord.com/api/v10/users/@me/guilds/${guildId}/member`,
     { headers: { Authorization: `Bearer ${discordAccessToken}` } },
   );
-  const member = await response.json().catch(() => null);
+  const member = await response.json().catch(() => null) as AnyRecord | null;
   if (!response.ok) {
     const e = new Error(
       member?.message || "Could not verify Discord server membership from OAuth",

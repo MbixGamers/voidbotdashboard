@@ -165,7 +165,7 @@ function mergeStaffRows(
 // GET /api/dashboard
 router.get("/dashboard", async (req, res) => {
   try {
-    const { user, discordId } = await requireUser(req as AnyRecord);
+    const { user, discordId } = await requireUser(req as { headers: Record<string, string | undefined> });
     const settings = await getDashboardSettings();
     const access = await verifyDiscordStaffAccess(discordId, settings, {
       discordAccessToken: req.headers["x-discord-provider-token"] as string | undefined,
@@ -254,7 +254,7 @@ router.get("/dashboard", async (req, res) => {
 // POST /api/admin/mod-checks
 router.post("/admin/mod-checks", async (req, res) => {
   try {
-    const { discordId } = await requireUser(req as AnyRecord);
+    const { discordId } = await requireUser(req as { headers: Record<string, string | undefined> });
     const currentSettings = await getDashboardSettings();
     await verifyDiscordStaffAccess(discordId, currentSettings, {
       discordAccessToken: req.headers["x-discord-provider-token"] as string | undefined,
