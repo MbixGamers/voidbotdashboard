@@ -180,8 +180,8 @@ export default async function handler(req, res) {
       profile,
       isAdmin,
       modCheck: modChecks[0] || {
-        weekly_ticket_goal: 0,
-        message_goal: 0,
+        weekly_ticket_goal: settings.weekly_ticket_goal || 0,
+        message_goal: settings.message_goal || 0,
         active_from: null,
         active_to: null
       },

@@ -8,6 +8,9 @@ const DEFAULT_STORE_DIR = isServerlessReadOnlyRuntime ? path.join('/tmp', 'voidd
 const STORE_DIR = process.env.DASHBOARD_JSON_DIR || DEFAULT_STORE_DIR;
 const STORE_FILE = process.env.DASHBOARD_JSON_FILE || path.join(STORE_DIR, 'dashboard-store.json');
 const anonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '');
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE || null;
+const useSupabaseRest = Boolean(supabaseUrl && serviceRoleKey);
 
 const DEFAULT_AUTH_GUILD_ID = '1454879351605690522';
 const DEFAULT_AUTH_ROLE_ID = '1454916770912534706,1478605157523787916,1478604846708822087,1458995834984206560';
@@ -110,10 +113,29 @@ function applyQuery(rows, query = '') {
 }
 
 export async function selectRows(table, query) {
+  if (useSupabaseRest) {
+    const separator = query ? (query.startsWith('?') ? '' : '?') : '?';
+    const response = await supabaseRest(table, `${separator}${query || 'select=*'}`);
+    return Array.isArray(response) ? response : [];
+  }
+
   const store = await readStore();
   return applyQuery(store[table] || [], query);
 }
 export async function upsertRows(table, rows, conflictColumn) {
+  if (useSupabaseRest) {
+    const params = new URLSearchParams();
+    if (conflictColumn) params.set('on_conflict', conflictColumn);
+    const response = await supabaseRest(table, `?${params.toString()}`, {
+      method: 'POST',
+      headers: {
+        Prefer: 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify(rows)
+    });
+    return Array.isArray(response) ? response : [];
+  }
+
   const store = await readStore();
   store[table] = store[table] || [];
   const saved = [];
@@ -130,6 +152,17 @@ export async function upsertRows(table, rows, conflictColumn) {
   return saved;
 }
 export async function insertRows(table, rows) {
+  if (useSupabaseRest) {
+    const response = await supabaseRest(table, '', {
+      method: 'POST',
+      headers: {
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(rows)
+    });
+    return Array.isArray(response) ? response : [];
+  }
+
   const withIds = rows.map((row) => ({ id: row.id || `${Date.now()}-${Math.random().toString(36).slice(2)}`, created_at: row.created_at || new Date().toISOString(), ...row }));
   const store = await readStore(); store[table] = store[table] || [];
   if (table === 'dashboard_message_events') {
@@ -138,11 +171,45 @@ export async function insertRows(table, rows) {
   store[table].push(...withIds); await writeStore(store); return withIds;
 }
 export async function updateRows(table, query, patch) {
+  if (useSupabaseRest) {
+    const separator = query ? (query.startsWith('?') ? '' : '?') : '?';
+    const response = await supabaseRest(table, `${separator}${query || ''}`, {
+      method: 'PATCH',
+      headers: {
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(patch)
+    });
+    return Array.isArray(response) ? response : [];
+  }
+
   const store = await readStore(); store[table] = store[table] || [];
   const matched = applyQuery(store[table], query);
   const ids = new Set(matched.map((row) => row.id || row.discord_id || row.ticket_channel_id));
   store[table] = store[table].map((row) => ids.has(row.id || row.discord_id || row.ticket_channel_id) ? { ...row, ...patch } : row);
   await writeStore(store); return store[table].filter((row) => ids.has(row.id || row.discord_id || row.ticket_channel_id));
+}
+
+async function supabaseRest(table, query = '', options = {}) {
+  const response = await fetch(`${supabaseUrl}/rest/v1/${table}${query}`, {
+    method: options.method || 'GET',
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(options.headers || {})
+    },
+    body: options.body
+  });
+
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!response.ok) {
+    const error = new Error(data?.message || data?.msg || text || `Supabase ${response.status}`);
+    error.statusCode = response.status;
+    throw error;
+  }
+  return data;
 }
 
 export async function verifySupabaseToken(accessToken) {
@@ -166,7 +233,7 @@ export function getAdminDiscordIds(settings = null) { return Array.from(new Set(
 export function isAdminDiscordId(discordId, settings = null) { return getAdminDiscordIds(settings).includes(String(discordId)); }
 function normalizeDashboardSettings(row = {}) { const authRoleIds = getConfiguredAuthRoleIds(row); const trackedRoleIds = normalizeRoleIds(row.tracked_role_ids || row.tracked_role_id || row.auth_role_ids || row.auth_role_id); return { ...defaultDashboardSettings, ...row, auth_guild_id: getConfiguredAuthGuildId(row), auth_role_id: authRoleIds.join(','), auth_role_ids: authRoleIds, tracked_role_ids: trackedRoleIds.length ? trackedRoleIds : authRoleIds, admin_discord_ids: normalizeDiscordIds(row.admin_discord_ids) }; }
 export async function getDashboardSettings() { const rows = await selectRows('dashboard_settings', 'id=eq.global&limit=1'); return normalizeDashboardSettings(rows[0] || defaultDashboardSettings); }
-export async function saveDashboardSettings(settings) { const authRoleIds = normalizeRoleIds(settings.auth_role_id || settings.auth_role_ids); const trackedRoleIds = normalizeRoleIds(settings.tracked_role_ids || settings.tracked_role_id || settings.auth_role_id || settings.auth_role_ids); const rows = await upsertRows('dashboard_settings', [{ id: 'global', auth_guild_id: String(settings.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID).trim(), auth_role_id: (authRoleIds.length ? authRoleIds : getConfiguredAuthRoleIds(defaultDashboardSettings)).join(','), auth_role_ids: authRoleIds.length ? authRoleIds : getConfiguredAuthRoleIds(defaultDashboardSettings), tracked_role_ids: trackedRoleIds.length ? trackedRoleIds : (authRoleIds.length ? authRoleIds : getConfiguredAuthRoleIds(defaultDashboardSettings)), admin_discord_ids: normalizeDiscordIds(settings.admin_discord_ids).filter((id) => id !== MAIN_ADMIN_DISCORD_ID), updated_by: settings.updated_by || null, updated_at: new Date().toISOString() }], 'id'); return normalizeDashboardSettings(rows[0] || {}); }
+export async function saveDashboardSettings(settings) { const authRoleIds = normalizeRoleIds(settings.auth_role_id || settings.auth_role_ids); const trackedRoleIds = normalizeRoleIds(settings.tracked_role_ids || settings.tracked_role_id || settings.auth_role_id || settings.auth_role_ids); const row = { id: 'global', auth_guild_id: String(settings.auth_guild_id || ENV_AUTH_GUILD_ID || DEFAULT_AUTH_GUILD_ID).trim(), auth_role_id: (authRoleIds.length ? authRoleIds : getConfiguredAuthRoleIds(defaultDashboardSettings)).join(','), auth_role_ids: authRoleIds.length ? authRoleIds : getConfiguredAuthRoleIds(defaultDashboardSettings), tracked_role_ids: trackedRoleIds.length ? trackedRoleIds : (authRoleIds.length ? authRoleIds : getConfiguredAuthRoleIds(defaultDashboardSettings)), admin_discord_ids: normalizeDiscordIds(settings.admin_discord_ids).filter((id) => id !== MAIN_ADMIN_DISCORD_ID), updated_by: settings.updated_by || null, updated_at: new Date().toISOString() }; if (settings.weekly_ticket_goal !== undefined) row.weekly_ticket_goal = Math.max(0, Number(settings.weekly_ticket_goal || 0)); if (settings.message_goal !== undefined) row.message_goal = Math.max(0, Number(settings.message_goal || 0)); const rows = await upsertRows('dashboard_settings', [row], 'id'); return normalizeDashboardSettings(rows[0] || {}); }
 function getDiscordBotToken() { return process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN || null; }
 export async function fetchDiscordGuildMember(guildId, discordId) { const token = getDiscordBotToken(); if (!token) { const e = new Error('Dashboard staff verification is not configured. Add DISCORD_BOT_TOKEN to the dashboard environment.'); e.statusCode = 503; throw e; } const r = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, { headers: { Authorization: `Bot ${token}` } }); const m = await r.json().catch(() => null); if (!r.ok) { const e = new Error(m?.message || 'Could not verify Discord server membership'); e.statusCode = r.status; throw e; } return m; }
 export async function fetchDiscordGuildMembers(guildId, options = {}) { const token = getDiscordBotToken(); if (!token) { const e = new Error('Dashboard staff directory is not configured. Add DISCORD_BOT_TOKEN to the dashboard environment.'); e.statusCode = 503; throw e; } const limit = Math.min(Math.max(Number(options.limit || 1000), 1), 1000); const maxPages = Math.max(Number(options.maxPages || 10), 1); const members = []; let after = '0'; for (let page = 0; page < maxPages; page += 1) { const params = new URLSearchParams({ limit: String(limit), after }); const r = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members?${params}`, { headers: { Authorization: `Bot ${token}` } }); const p = await r.json().catch(() => null); if (!r.ok) { const e = new Error(p?.message || 'Could not load Discord guild members'); e.statusCode = r.status; throw e; } if (!Array.isArray(p) || !p.length) break; members.push(...p); const lastId = p[p.length - 1]?.user?.id; if (!lastId || p.length < limit) break; after = lastId; } return members; }
